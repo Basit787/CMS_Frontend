@@ -1,0 +1,29 @@
+.card {
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    overflow: hidden;
+    text-align: center;
+}
+
+.input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px
+}
+
+.input-group .input-field {
+    width: 48%;
+    text-align: left;
+}
+
+.submit-btn {
+    margin: 16px !important;
+}
+
+.submit-btn:hover {
+    background-color: #2980b9;
+}

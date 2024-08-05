@@ -1,0 +1,42 @@
+body {
+    overflow: hidden;
+    margin: 0;
+}
+
+.main-div {
+    background:url(17973908.jpg);
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: auto;
+}
+.container{
+        background: linear-gradient(to bottom left,rgba(144, 255, 144, 0.4),rgba(255, 255, 255, 0.4),rgb(155, 155, 255,0.4));
+        height: 350px;
+        width: 500px !important;
+        border-radius: 20px;
+        padding: 10px;
+        margin: 20px;
+}
+.form_title {
+    font-size: 30px;
+    background: linear-gradient(to top left,rgb(0, 68, 255), rgb(0, 247, 255));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.btn {
+    background: linear-gradient(to left bottom, blue, lightskyblue);
+    font-weight: bold;
+    letter-spacing: 0.2rem;
+    height: 45px;
+}
+.btn:hover{
+    background: linear-gradient(to left bottom, lightskyblue, blue);
+}

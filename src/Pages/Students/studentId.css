@@ -1,0 +1,16 @@
+.student-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.detail-item {
+    padding: 20px;
+}
+
+.detail-item h2 {
+    font-size: 1.2em;
+}
+
+.detail-item p {
+    margin: 0;
+}

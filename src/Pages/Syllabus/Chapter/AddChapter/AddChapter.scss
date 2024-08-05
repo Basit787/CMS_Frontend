@@ -1,0 +1,40 @@
+.mainSyllabus{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 35rem;
+    padding: 20px;
+    overflow: auto;
+}
+/* .mainSyllabus h1{
+    margin: 0 ;
+} */
+.input-syllabus{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.input-syllabus .syllabus{
+    width: 30rem;
+}   
+ 
+
+.concept-btn{
+    margin: 1rem !important;
+    width: 10rem !important;
+}
+
+.submit-btn{
+    margin: 1rem !important;
+        width: 10rem !important;
+}
+.form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.syllabus-concepts{
+    width: 100%;
+}
