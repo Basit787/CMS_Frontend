@@ -4,7 +4,7 @@ export const LoginSlice = createSlice({
   name: "login",
   initialState: {},
   reducers: {
-    entry: (state, action) => {
+    login: (state, action) => {
       const keys = Object.keys(action.payload);
       keys.forEach((key) => {
         state[key] = action.payload[key];
@@ -19,6 +19,6 @@ export const LoginSlice = createSlice({
   },
 });
 
-export const { entry, logout } = LoginSlice.actions;
+export const { login, logout } = LoginSlice.actions;
 
 export default LoginSlice.reducer;

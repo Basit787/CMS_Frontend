@@ -1,0 +1,20 @@
+{
+  "heading": "Add Course",
+  "heading2": "Update Course",
+  "fields": [
+    {
+      "label": "Title",
+      "name": "title",
+      "type": "text",
+      "placeholder": "Enter the Title of Course"
+    },
+    {
+      "label": "Description",
+      "name": "description",
+      "type": "text",
+      "placeholder": "Enter the Description of Course"
+    }
+  ],
+  "btn": "Submit",
+  "btn2": "Update"
+}

@@ -3,14 +3,14 @@ import CheckIcon from "@mui/icons-material/Check";
 import CoPresentIcon from "@mui/icons-material/CoPresent";
 import DoNotDisturbAltIcon from "@mui/icons-material/DoNotDisturbAlt";
 import { Box, Card } from "@mui/material";
-import { PieChart } from "@mui/x-charts/PieChart";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Endpoints } from "../../apis/apiContsants";
 import instance from "../../apis/apiRequest";
-import "./dashboard.scss";
+import { setSnackBarOpen, SnackbarType } from "../../reducers/SnacbarSlice";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState([]);
@@ -19,38 +19,22 @@ const Dashboard = () => {
     getDashboardData();
   }, []);
 
-  //Total strudents in dashboard
+  const dispatch = useDispatch();
+
   const getDashboardData = () => {
     instance
       .get(Endpoints.dashboardApi)
-      .then((res) => {
-        setDashboardData(res.data.data);
-      })
+      .then((res) => setDashboardData(res.data.data))
       .catch((err) => {
         console.log("Cant get the total students in Dashboard" + err);
+        dispatch(
+          setSnackBarOpen({
+            type: SnackbarType.error,
+            message: "Failed to fetched data!!!",
+          })
+        );
       });
   };
-
-  const data = [
-    {
-      id: 0,
-      value: dashboardData.active,
-      label: "Active Students",
-      color: "#1e81b0",
-    },
-    {
-      id: 1,
-      value: dashboardData.inActive,
-      label: "Inactive Students",
-      color: "#BE3144",
-    },
-    {
-      id: 2,
-      value: dashboardData.completed,
-      label: "Course Complete",
-      color: "#65B741",
-    },
-  ];
 
   // mapping dashboard
 
@@ -59,39 +43,38 @@ const Dashboard = () => {
       title: "Total Students",
       icon: <CoPresentIcon />,
       value: dashboardData.total,
-      background: "#FF8989",
+      background: "bg-sky-500",
     },
     {
       title: "Active Students",
       icon: <CheckIcon />,
       value: dashboardData.active,
-      background: "#1e81b0",
+      background: "bg-green-500",
     },
     {
       title: "InActive Students",
       icon: <DoNotDisturbAltIcon />,
       value: dashboardData.inActive,
-      background: "#BE3144",
+      background: "bg-red-500",
     },
     {
       title: "Course Complete",
       icon: <AssignmentTurnedInIcon />,
       value: dashboardData.completed,
-      background: "#65B741 ",
+      background: "bg-sky-500",
     },
   ];
 
   return (
     <Box>
-      <Box sx={{ margin: "5%" }}>
-        <Box className="dashboard">
+      <Box>
+        <Box className="grid md:grid-cols-4 grid-cols-2 flex-wrap justify-between items-center gap-3">
           {dashboard.map((item, value) => (
             <Card
-              className="DashboardCard"
-              sx={{ backgroundColor: item.background, color: "white" }}
               key={value}
+              className={`${item.background} flex flex-row justify-between items-center  w-full p-4 text-white`}
             >
-              <Box className="card-content">
+              <Box cla>
                 <h1>{item.value}</h1>
                 <h3>{item.title}</h3>
               </Box>
@@ -101,30 +84,9 @@ const Dashboard = () => {
         </Box>
       </Box>
       <Box>
-        <Box sx={{ width: "50%", float: "left" }} className="pieChart">
-          <PieChart
-            series={[
-              {
-                data,
-                highlightScope: {
-                  faded: "global",
-                  highlighted: "item",
-                },
-                faded: {
-                  innerRadius: 30,
-                  additionalRadius: -30,
-                  color: "gray",
-                },
-              },
-            ]}
-            height={250}
-          />
-        </Box>
-        <Box sx={{}}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateCalendar />
-          </LocalizationProvider>
-        </Box>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateCalendar />
+        </LocalizationProvider>
       </Box>
     </Box>
   );

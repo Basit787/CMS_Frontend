@@ -1,36 +1,32 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import {
-  Box,
-  Card,
-  DialogActions,
-  DialogContentText,
-  DialogTitle,
-} from "@mui/material";
+import { Box, Card } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {Endpoints} from "../../../apis/apiContsants";
+import { Endpoints } from "../../../apis/apiContsants";
 import instance from "../../../apis/apiRequest";
-import AddCourse from "./Course Form/AddCourse";
-import "./Course.scss";
+import DialogBox from "../../../components/Dialog";
+import { setDialogOpen } from "../../../reducers/DialogBoxSlice";
+import { setSnackBarOpen, SnackbarType } from "../../../reducers/SnacbarSlice";
+import CourseAdd from "./CourseAdd";
 
 const Course = () => {
   const [courseData, setCourseData] = useState([]);
   const [editedCourse, setEditedCourse] = useState(); //props send
   const [open, setOpen] = useState(false); //dialog box
-  const [dialogBoxDelete, setDialogBoxDelete] = useState();
-  const [deleteName, setDeleteName] = useState();
 
   useEffect(() => {
     getCourseData();
   }, []);
+
+  const dispatch = useDispatch();
+
   //getCourse
   const getCourseData = () => {
     instance
@@ -93,24 +89,10 @@ const Course = () => {
       .then((res) => {
         console.log("course deleted", res.data.data);
         getCourseData();
-        handleDeleteClose();
       })
       .catch((err) => {
         console.log("can't delete the  course " + err);
       });
-  };
-
-  //deletecourse pop-up
-  const [deleteOpen, setDeleteOpen] = useState(false);
-
-  const handleDeleteClickOpen = (courseId, courseTitle) => {
-    setDialogBoxDelete(courseId);
-    setDeleteName(courseTitle);
-    setDeleteOpen(true);
-  };
-
-  const handleDeleteClose = () => {
-    setDeleteOpen(false);
   };
 
   //validation of course
@@ -148,147 +130,109 @@ const Course = () => {
   //viewCourse
   const navigate = useNavigate();
   const viewCourseData = (Id, title) => {
-    navigate("/course/chapter", { state: { courseId: Id, courseTitle: title } });
+    navigate("/course/chapter", {
+      state: { courseId: Id, courseTitle: title },
+    });
+  };
+
+  //deletecourse pop-up
+  const handleDeleteClickOpen = (courseId) => {
+    dispatch(
+      setDialogOpen({
+        title: "Confirm Deletion",
+        message: "Do you really want to delete the course",
+        response: (ActionType) => {
+          if (ActionType === "positive") {
+            deleteCourseData(courseId);
+            dispatch(
+              setSnackBarOpen({
+                message: "Course deleted successfully",
+                type: SnackbarType.success,
+              })
+            );
+          } else {
+            dispatch(
+              setSnackBarOpen({
+                message: "Failed to delete the course",
+                type: SnackbarType.error,
+              })
+            );
+          }
+        },
+      })
+    );
+  };
+
+  const getMapData = (item, index) => {
+    return (
+      <Card key={index} className="m-2 p-2 flex  justify-between items-center">
+        <Box>
+          <h1>{item.title}</h1>
+          <p>{item.description}</p>
+        </Box>
+        <Box className="flex flex-col m-2 md:flex-row">
+          <Button
+            color="success"
+            onClick={() => {
+              editCourseData(item._id);
+            }}
+          >
+            <EditIcon />
+          </Button>
+          <Button
+            color="error"
+            onClick={() => handleDeleteClickOpen(item._id, item.title)}
+          >
+            <DeleteIcon />
+          </Button>
+          <Button
+            onClick={() => {
+              viewCourseData(item._id, item.title);
+            }}
+          >
+            <RemoveRedEyeIcon />
+          </Button>
+        </Box>
+      </Card>
+    );
   };
   return (
     <Box>
-      <Box>
-        <AppBar
-          position="static"
-          color="default"
-          elevation={0}
-          sx={{ borderBottom: "1px solid rgba(0, 0, 0, 0.12)" }}
-        >
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-            {courseData.length === 0 ? (
-              <Typography sx={{ fontSize: "2rem", fontWeight: "bolder" }}>
-                {"Add Course"}
-              </Typography>
-            ) : (
-              <Typography sx={{ fontSize: "2rem", fontWeight: "bolder" }}>
-                {"Select Course"}
-              </Typography>
-            )}
-            <Box>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  handleClickOpen();
-                  setEditedCourse(undefined);
-                }}
-              >
-                Add Course
-              </Button>
-              <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogContent>
-                  <AddCourse
-                    onSubmit={submitCourseForm}
-                    sendCourse={editedCourse}
-                  />
-                </DialogContent>
-              </Dialog>
-            </Box>
-          </Toolbar>
-        </AppBar>
-        <Typography sx={{ my: 5, mx: 2 }} color="text.secondary" align="center">
+      <AppBar position="static" color="default" elevation={0}>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           {courseData.length === 0 ? (
-            <Typography sx={{ textAlign: "center" }}>
-              {"No course were added"}
-            </Typography>
+            <Typography>{"Add Course"}</Typography>
           ) : (
-            <>
-              {courseData.map((item, index) => (
-                <Card
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: "10px",
-                  }}
-                  key={index}
-                >
-                  <Box className="courses">
-                    <h1>{item.title}</h1>
-                    <p>{item.description}</p>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginRight: "10px",
-                      gap: "10px",
-                    }}
-                  >
-                    {/* edit button */}
-                    <Button
-                      color="success"
-                      onClick={() => {
-                        editCourseData(item._id);
-                      }}
-                    >
-                      <EditIcon />
-                    </Button>
-
-                    {/* delete button */}
-                    <Button
-                      color="error"
-                      onClick={() =>
-                        handleDeleteClickOpen(item._id, item.title)
-                      }
-                    >
-                      <DeleteIcon />
-                    </Button>
-                    <Dialog
-                      open={deleteOpen}
-                      onClose={handleDeleteClose}
-                      aria-labelledby="alert-dialog-title"
-                      aria-describedby="alert-dialog-description"
-                    >
-                      <DialogTitle id="alert-dialog-title">
-                        {"Confirm Deletion"}
-                      </DialogTitle>
-                      <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                          `Do you really want to delete the{" "}
-                          <b>
-                            <big>{deleteName}</big>
-                          </b>
-                          , this step is undone!!!`
-                        </DialogContentText>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={handleDeleteClose} variant="contained">
-                          Disagree
-                        </Button>
-                        <Button
-                          onClick={() => deleteCourseData(dialogBoxDelete)}
-                          variant="contained"
-                          color="error"
-                        >
-                          Agree
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-
-                    {/* view button */}
-                    <Button
-                      onClick={() => {
-                        viewCourseData(item._id, item.title);
-                      }}
-                    >
-                      <RemoveRedEyeIcon />
-                    </Button>
-                  </Box>
-                </Card>
-              ))}
-            </>
+            <Typography>{"Select Course"}</Typography>
           )}
-        </Typography>
-      </Box>
+          <Box>
+            <Button
+              variant="contained"
+              onClick={() => {
+                handleClickOpen();
+                setEditedCourse(undefined);
+              }}
+            >
+              Add Course
+            </Button>
+            <DialogBox openTrue={open} closeTrue={() => setOpen(false)}>
+              <CourseAdd
+                onSubmit={submitCourseForm}
+                sendCourse={editedCourse}
+              />
+            </DialogBox>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <Typography>
+        {courseData.length === 0 ? (
+          <Typography sx={{ textAlign: "center" }}>
+            {"No course were added"}
+          </Typography>
+        ) : (
+          <>{courseData.map((item, index) => getMapData(item, index))}</>
+        )}
+      </Typography>
     </Box>
   );
 };

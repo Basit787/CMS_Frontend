@@ -20,7 +20,7 @@ import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import { NavLink } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout } from "../reducers/LoginSlice";
-import { AccountCircle, Dashboard } from "@mui/icons-material";
+import { AccountCircle, Dashboard, Description } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Dialog from "@mui/material/Dialog";
@@ -28,6 +28,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { ActionType, setDialogOpen } from "../reducers/DialogBoxSlice";
+import { setSnackBarOpen, SnackbarType } from "../reducers/SnacbarSlice";
 
 const drawerWidth = 240;
 
@@ -77,8 +79,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 export default function PersistentDrawerLeft({ children }) {
-  const [heading, setHeading] = useState("Dashboard"); //heading on sidebar
-
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -86,25 +86,36 @@ export default function PersistentDrawerLeft({ children }) {
     setOpen(true);
   };
 
+  const [heading, setHeading] = useState("Dashboard"); //heading on sidebar
+
   const handleDrawerClose = () => {
     setOpen(false);
   };
 
   const dispatch = useDispatch();
 
-  //dialogbox
-
-  const [dialog, setDialog] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setDialog(true);
-  };
-
-  const handleClose = () => {
-    setDialog(false);
-  };
-  const handleOpen = () => {
-    dispatch(logout());
+  const handleOpenDialog = () => {
+    dispatch(
+      setDialogOpen({
+        title: "Do you want to logout!!!",
+        message: "Do you really want to LogOut, if yes click agree",
+        response: (actionType) => {
+          if (actionType === ActionType.positive) {
+            console.log("Logout succesfull");
+            dispatch(logout());
+          }
+          if (actionType === ActionType.negative) {
+            console.log("negative");
+            dispatch(
+              setSnackBarOpen({
+                type: SnackbarType.error,
+                message: "Failed to logout!!!",
+              })
+            );
+          }
+        },
+      })
+    );
   };
 
   const menuItems = [
@@ -144,43 +155,13 @@ export default function PersistentDrawerLeft({ children }) {
               {heading}
             </Typography>
           </Box>
-          <Button variant="contained" onClick={handleClickOpen}>
+          <Button
+            variant="contained"
+            onClick={handleOpenDialog}
+            aria-hidden={true}
+          >
             <LogoutIcon />
           </Button>
-          <Dialog
-            open={dialog}
-            onClose={handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle
-              id="alert-dialog-title"
-              sx={{ backgroundColor: "red", color: "white" }}
-            >
-              {"Do you want to logout!!!"}
-            </DialogTitle>
-            <DialogContent>
-              <DialogContentText
-                id="alert-dialog-description"
-                sx={{ marginTop: "20px" }}
-              >
-                Do you really want to LogOut, if yes click agree
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleClose} variant="outlined">
-                Disagree
-              </Button>
-              <Button
-                onClick={handleOpen}
-                autoFocus
-                variant="outlined"
-                color="error"
-              >
-                Agree
-              </Button>
-            </DialogActions>
-          </Dialog>
         </Toolbar>
       </AppBar>
       <Drawer

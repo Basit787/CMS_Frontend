@@ -23,23 +23,20 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { GridExpandMoreIcon } from "@mui/x-data-grid";
 import { chapterApi, Endpoints } from "../../../apis/apiContsants";
+import { useDispatch } from "react-redux";
 
 const Chapter = () => {
-  //uselocation to get the heading from add_course page
-
   const location = useLocation();
   const { courseTitle, courseId } = location.state;
   //Syllabus data
   const [chapter, setChapter] = useState([]);
-  const [confirmDelete, setConfirmDelete] = useState();
-  const [deleteName, setDeleteName] = useState();
 
-  // usenavigate
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   //navigate to add course form
   const openChapterForm = () => {
-    // console.log("the id is" + id);
     navigate("/addChapter", { state: { courseId } });
   };
 
@@ -69,7 +66,6 @@ const Chapter = () => {
       .then(() => {
         console.log("chapter deleted successfully");
         getChapters();
-        handleDeleteClose();
       })
       .catch((err) => {
         console.log("chapter not deleted" + err);
@@ -78,33 +74,21 @@ const Chapter = () => {
 
   //Delete popup
 
-  const [deleteOpen, setDeleteOpen] = React.useState(false);
-
-  const handleDeleteOpen = (id, title) => {
-    setConfirmDelete(id);
-    setDeleteName(title);
-    setDeleteOpen(true);
+  const handleDeleteOpen = (id) => {
+    // dispatch; //use dispatch to delete using popup
   };
 
-  const handleDeleteClose = () => {
-    setDeleteOpen(false);
-  };
   //edit
   const handleEditChapter = (id) => {
     navigate("/addChapter", { state: { editId: id } });
   };
   return (
     <Box>
-      <AppBar
-        position="static"
-        color="default"
-        elevation={0}
-        sx={{ borderBottom: "1px solid rgba(0, 0, 0, 0.12)" }}
-      >
+      <AppBar position="static" color="default" elevation={0}>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box>
             <h2>
-              Course: <i>{courseTitle}</i>
+              Chapter: <i>{courseTitle}</i>
             </h2>
           </Box>
           <Box>
@@ -164,39 +148,10 @@ const Chapter = () => {
 
                       <Button
                         color="error"
-                        onClick={() => handleDeleteOpen(item._id, item.title)}
+                        onClick={() => handleDeleteOpen(item._id)}
                       >
                         <DeleteIcon />
                       </Button>
-                      <Dialog open={deleteOpen} onClose={handleDeleteClose}>
-                        <DialogTitle id="alert-dialog-title">
-                          {"Confirm Deletion"}
-                        </DialogTitle>
-                        <DialogContent>
-                          <DialogContentText id="alert-dialog-description">
-                            Do you really want to delete{" "}
-                            <b>
-                              <big>{deleteName}</big>
-                            </b>
-                          </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                          <Button
-                            variant="contained"
-                            onClick={handleDeleteClose}
-                          >
-                            Disagree
-                          </Button>
-                          <Button
-                            variant="contained"
-                            color="error"
-                            onClick={() => handleDeleteChapter(confirmDelete)}
-                            autoFocus
-                          >
-                            Agree
-                          </Button>
-                        </DialogActions>
-                      </Dialog>
                     </Box>
                   </Box>
                 </AccordionSummary>

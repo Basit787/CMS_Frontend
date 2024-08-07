@@ -14,7 +14,8 @@ import { styled } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import { Endpoints } from "../../apis/apiContsants";
 import instance from "../../apis/apiRequest";
-import "./Admission.scss";
+import CMDynamicForm from "../../components/CMDynamicForm";
+import addmissionFields from "./AdmissionForm.json";
 
 const blue = {
   100: "#DAECFF",
@@ -73,54 +74,19 @@ const Textarea = styled(BaseTextareaAutosize)(
 );
 
 const Addmission = (props) => {
-  const [formData, setFormData] = useState({
-    studentname: "",
-    dateOfBirth: "",
-    phoneNumber: "",
-    email: "",
-    gender: "",
-    dateOfJoining: "",
-    aadharCard: "",
-    panCard: "",
-    highestQualification: "",
-    selectCourse: "",
-    address: "",
-    password: "",
-    studentId: "",
-  });
-
   //props of students...
   useEffect(() => {
     if (props.sendStudentData) {
       console.log("Data received", props.sendStudentData);
-      setFormData(props.sendStudentData);
+      // setFormData(props.sendStudentData);
     }
     getCourseData();
     getQualificationData();
   }, []);
 
-  //inputs
-  const handleChange = (event) => {
-    setFormData((previousValue) => ({
-      ...previousValue,
-      [event.target.name]: event.target.value,
-    }));
-  };
-
   //Submit`
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    props.onSubmit(formData);
-  };
-
-  //password
-
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
+  const handleSubmit = (data) => {
+    props.onSubmit(data);
   };
 
   //get course data
@@ -154,211 +120,12 @@ const Addmission = (props) => {
       });
   };
   return (
-    <Box>
-      <Card className="card">
-        <h1>Admission Form</h1>
-
-        <form onSubmit={handleSubmit}>
-          <Box className="input-group">
-            {/* name */}
-            <TextField
-              label="Name"
-              variant="outlined"
-              type="text"
-              placeholder="Enter Your name"
-              onChange={handleChange}
-              className="input-field"
-              name="studentname"
-              value={formData.studentname}
-            />
-            {/* studentID */}
-            <TextField
-              label="Student Id"
-              variant="outlined"
-              type="text"
-              placeholder="Enter Your Student Id"
-              onChange={handleChange}
-              className="input-field"
-              name="studentId"
-              value={formData.studentId}
-            />
-            {/* password */}
-
-            <FormControl variant="outlined" className="input-field">
-              <InputLabel htmlFor="outlined-adornment-password">
-                Password
-              </InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-password"
-                type={showPassword ? "text" : "password"}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                label="Password"
-                onChange={handleChange}
-                name="password"
-                value={formData.password}
-              />
-            </FormControl>
-
-            {/* Date of birth */}
-            <TextField
-              label="Date of Birth"
-              variant="outlined"
-              type="date"
-              onChange={handleChange}
-              className="input-field"
-              name="dateOfBirth"
-              focused
-              value={formData.dateOfBirth}
-            />
-            {/* phone number */}
-            <TextField
-              label="Phone Number"
-              variant="outlined"
-              type="text"
-              onChange={handleChange}
-              className="input-field"
-              name="phoneNumber"
-              maxLength={10}
-              value={formData.phoneNumber}
-            />
-            {/* e-mail */}
-            <TextField
-              label="E-Mail"
-              variant="outlined"
-              type="email"
-              placeholder="Enter Your E-Mail"
-              onChange={handleChange}
-              className="input-field"
-              name="email"
-              value={formData.email}
-            />
-            {/* gender */}
-            <FormControl className="input-field">
-              <InputLabel id="demo-simple-select-label">
-                Select Gender
-              </InputLabel>
-              <Select
-                value={formData.gender}
-                label="Select Gender"
-                onChange={handleChange}
-                name="gender"
-              >
-                <MenuItem value="" disabled>
-                  Select Gender
-                </MenuItem>
-                <MenuItem value="Male">Male</MenuItem>
-                <MenuItem value="Female">Female</MenuItem>
-              </Select>
-            </FormControl>
-
-            {/* joining date */}
-            <TextField
-              label="Date of Joining"
-              variant="outlined"
-              type="date"
-              onChange={handleChange}
-              className="input-field"
-              name="dateOfJoining"
-              focused
-              value={formData.dateOfJoining}
-            />
-
-            {/* aadhar card */}
-            <TextField
-              label="Aadhaar-card"
-              variant="outlined"
-              type="text"
-              placeholder="Enter Your Aadhaar Card number"
-              onChange={handleChange}
-              className="input-field"
-              name="aadharCard"
-              maxLength={12}
-              value={formData.aadharCard}
-            />
-
-            {/* pancard */}
-            <TextField
-              label="Pan-Card (optional)"
-              variant="outlined"
-              type="text"
-              placeholder="Enter Your Pan-Card number"
-              onChange={handleChange}
-              className="input-field"
-              name="panCard"
-              maxLength={10}
-              value={formData.panCard}
-            />
-
-            {/* qualification */}
-            <FormControl className="input-field">
-              <InputLabel id="demo-simple-select-label">
-                Highest Qualification
-              </InputLabel>
-              <Select
-                label="Highest Qualification"
-                onChange={handleChange}
-                name="highestQualification"
-                value={formData.highestQualification}
-              >
-                <MenuItem disabled>Select Highest Qualification</MenuItem>
-                {qualificationData.map((data) => (
-                  <MenuItem value={data.key}>{data.label}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            {/* course selection */}
-            <FormControl className="input-field">
-              <InputLabel id="demo-simple-select-label">
-                Select Course
-              </InputLabel>
-              <Select
-                label="Select Course"
-                onChange={handleChange}
-                name="selectCourse"
-                value={formData.selectCourse}
-              >
-                <MenuItem disabled>Select Course</MenuItem>
-                {courseData.map((data, index) => (
-                  <MenuItem value={data.title} key={index}>
-                    {data.title}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            {/* address */}
-            <Textarea
-              aria-label="minimum height"
-              minRows={2}
-              placeholder="Enter your address"
-              style={{ width: "94.5%" }}
-              name="address"
-              onChange={handleChange}
-              value={formData.address}
-            />
-          </Box>
-          <Button
-            type="submit"
-            variant="contained"
-            className="submit-btn"
-            // onClick={handleSubmit}
-          >
-            {props.sendStudentData === undefined ? "Submit" : "Update"}
-          </Button>
-        </form>
-      </Card>
+    <Box className=" w-full">
+      <CMDynamicForm
+        formFields={addmissionFields}
+        onSubmit={handleSubmit}
+        editedData={props.sendStudentData}
+      />
     </Box>
   );
 };

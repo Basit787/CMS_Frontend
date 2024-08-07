@@ -1,39 +1,31 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import SearchIcon from "@mui/icons-material/Search";
 import {
-  AppBar,
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-  Paper,
+  Card,
   Table,
   TableBody,
   TableContainer,
-  TableFooter,
   TableHead,
-  TablePagination,
   TableRow,
-  TextField,
-  Toolbar,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import React, { useEffect, useState } from "react";
-import {
-  Endpoints
-} from "../../apis/apiContsants";
+import { useDispatch } from "react-redux";
+import { Endpoints } from "../../apis/apiContsants";
 import instance from "../../apis/apiRequest";
+import Appbar from "../../components/Appbar";
+import DialogBox from "../../components/Dialog";
+import { setDialogOpen } from "../../reducers/DialogBoxSlice";
+import {
+  setSnackBarClose,
+  setSnackBarOpen,
+  SnackbarType,
+} from "../../reducers/SnacbarSlice";
 import Addmission from "../Addmission/Addmission";
-import "./student.scss";
-import StudentId from "./StudentId";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -56,28 +48,11 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const Students = () => {
-  //axios
   const [userData, setData] = useState([]);
-
-  //edit
-
   const [editedStudentData, setEditedStudentData] = useState();
 
-  //pagination
+  //opendialog
   const [open, setOpen] = useState(false);
-
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  //delete popup
-
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [idOpen, setIdOpen] = useState(false);
-
-  // dialogbox
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
   const handleClose = () => {
     setOpen(false);
@@ -87,6 +62,8 @@ const Students = () => {
   useEffect(() => {
     getStudentsData();
   }, []);
+
+  const dispatch = useDispatch();
 
   //get student
   const getStudentsData = () => {
@@ -98,6 +75,12 @@ const Students = () => {
       })
       .catch((err) => {
         console.log("cant get the student " + err);
+        dispatch(
+          setSnackBarOpen({
+            type: SnackbarType.error,
+            message: "Failed to fetched student data!!!",
+          })
+        );
       });
   };
 
@@ -109,9 +92,21 @@ const Students = () => {
         console.log("student added", res.data.data);
         getStudentsData();
         handleClose();
+        dispatch(
+          setSnackBarOpen({
+            type: SnackbarType.success,
+            message: "Student added successfully",
+          })
+        );
       })
       .catch((err) => {
         console.log("student didnt added!!! " + err);
+        dispatch(
+          setSnackBarClose({
+            type: SnackbarType.error,
+            message: "Failed to add student!!!",
+          })
+        );
       });
   };
 
@@ -123,16 +118,27 @@ const Students = () => {
         console.log("updated Succesfully", res.data.data);
         setEditedStudentData(res.data.data);
         handleClose();
+        dispatch(
+          setSnackBarOpen({
+            type: SnackbarType.success,
+            message: "Student updated successfully",
+          })
+        );
       })
       .catch((err) => {
         console.error("cant updated!!! ", err);
+        dispatch(
+          setSnackBarClose({
+            type: SnackbarType.error,
+            message: "Failed to update student!!!",
+          })
+        );
       });
   };
 
   //edit button
-
   const handleEdit = (studentId) => {
-    handleClickOpen();
+    setOpen(true);
     instance
       .get(Endpoints.student + studentId)
       .then((res) => {
@@ -151,11 +157,21 @@ const Students = () => {
       .then((res) => {
         console.log("student deleted successfully" + res.data);
         getStudentsData();
-        handleDeleteClose();
+        dispatch(
+          setSnackBarOpen({
+            type: SnackbarType.success,
+            message: "Student deleted successfully",
+          })
+        );
       })
       .catch((err) => {
         console.log("not deleted" + err);
-        handleDeleteClose();
+        dispatch(
+          setSnackBarClose({
+            type: SnackbarType.error,
+            message: "Failed to delete student!!!",
+          })
+        );
       });
   };
 
@@ -183,249 +199,119 @@ const Students = () => {
     }
   };
 
-  //pagination
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleAddStudent = () => {
+    setOpen(true);
+    setEditedStudentData(undefined);
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const getTableHeads = () => {
+    return (
+      <TableRow>
+        <StyledTableCell>Name</StyledTableCell>
+        <StyledTableCell align="center">Contact</StyledTableCell>
+        <StyledTableCell align="center">E-Mail</StyledTableCell>
+        <StyledTableCell align="center">Date of Joining</StyledTableCell>
+        <StyledTableCell align="center">Qualification</StyledTableCell>
+        <StyledTableCell align="center">Course</StyledTableCell>
+        <StyledTableCell align="center">Action</StyledTableCell>
+      </TableRow>
+    );
+  };
+
+  const getTableBody = (row, index) => {
+    return (
+      <StyledTableRow key={index}>
+        <StyledTableCell component="th" scope="row">
+          {row.studentname}
+        </StyledTableCell>
+        <StyledTableCell align="center">{row.phoneNumber}</StyledTableCell>
+        <StyledTableCell align="center">{row.email}</StyledTableCell>
+        <StyledTableCell align="center">{row.dateOfJoining}</StyledTableCell>
+        <StyledTableCell align="center">
+          {row.highestQualification}
+        </StyledTableCell>
+        <StyledTableCell align="center">{row.selectCourse}</StyledTableCell>
+        <StyledTableCell align="center">
+          <Button
+            color="success"
+            onClick={() => {
+              handleEdit(row._id);
+            }}
+          >
+            <EditIcon />
+          </Button>
+          <Button
+            color="error"
+            onClick={() => {
+              handleClickDeleteOpen(row._id);
+            }}
+          >
+            <DeleteIcon />
+          </Button>
+        </StyledTableCell>
+      </StyledTableRow>
+    );
   };
 
   //delete popup
-  const handleClickDeleteOpen = () => {
-    setDeleteOpen(true);
-  };
-
-  const handleDeleteClose = () => {
-    setDeleteOpen(false);
-  };
-
-  //View Id
-  const handleView = (studentId) => {
-    handleClickIdOpen();
-    instance
-      .get(Endpoints.student + studentId)
-      .then((res) => {
-        console.log("single data occured " + res.data.data);
-        setEditedStudentData(res.data.data);
+  const handleClickDeleteOpen = (deleteId) => {
+    console.log("delete id", deleteId);
+    dispatch(
+      setDialogOpen({
+        title: "Are you sure to delete the student?",
+        message: "Are you sure, because this procedure cannot be undo!!!",
+        response: (ActionType) => {
+          if (ActionType === "positive") {
+            handleDelete(deleteId);
+            dispatch(
+              setSnackBarOpen({
+                type: SnackbarType.success,
+                message: "Student deleted successfully",
+              })
+            );
+          }
+          if (ActionType === "negative") {
+            dispatch(
+              setSnackBarOpen({
+                type: SnackbarType.error,
+                message: "Failed to delete student",
+              })
+            );
+          }
+        },
       })
-      .catch((err) => {
-        console.log("single data not occurred" + err);
-      });
+    );
   };
-  //open Id
-  const handleClickIdOpen = () => {
-    setIdOpen(true);
-  };
-  const handleIdClose = () => {
-    setIdOpen(false);
-  };
+
   return (
     <Box>
-      <AppBar position="static" color="default" elevation={0}>
-        <Toolbar>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item>
-              <SearchIcon color="inherit" sx={{ display: "block" }} />
-            </Grid>
-            <Grid item xs>
-              <TextField
-                maxWidth
-                placeholder="Search by email address, phone number, or user UID"
-                InputProps={{
-                  disableUnderline: true,
-                  sx: { fontSize: "default" },
-                }}
-                variant="standard"
-              />
-            </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  handleClickOpen();
-                  setEditedStudentData(undefined);
-                }}
-              >
-                Add Student
-              </Button>
-              <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogActions>
-                  <Addmission
-                    onSubmit={onSubmitClick}
-                    sendStudentData={editedStudentData}
-                  />
-                </DialogActions>
-              </Dialog>
-            </Grid>
-          </Grid>
-        </Toolbar>
-      </AppBar>
+      <Appbar>
+        <Button variant="contained" onClick={handleAddStudent}>
+          Add Student
+        </Button>
+        {open && (
+          <DialogBox openTrue={open} closeTrue={(event) => setOpen(event)}>
+            <Addmission
+              onSubmit={onSubmitClick}
+              sendStudentData={editedStudentData}
+            />
+          </DialogBox>
+        )}
+      </Appbar>
       {userData.length === 0 ? (
-        <Typography sx={{ textAlign: "center" }}>
+        <Typography className="text-center">
           {"No students were added"}
         </Typography>
       ) : (
         <>
-          <Box sx={{ my: 2, mx: 2 }} color="text.secondary" align="center">
-            <Box
-              sx={{
-                my: 1,
-                mx: 1,
-                padding: "10px",
-                // overflowY: "auto",
-                height: "500px",
-              }}
-              color="text.secondary"
-              align="center"
-              className="scrollbar-hidden"
-            >
-              <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 700 }} aria-label="customized table">
-                  <TableHead>
-                    <TableRow>
-                      <StyledTableCell>Name</StyledTableCell>
-                      <StyledTableCell align="center">Contact</StyledTableCell>
-                      <StyledTableCell align="center">E-Mail</StyledTableCell>
-                      <StyledTableCell align="center">
-                        Date of Joining
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        Qualification
-                      </StyledTableCell>
-                      <StyledTableCell align="center">Course</StyledTableCell>
-                      <StyledTableCell align="center">Action</StyledTableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {userData
-                      .slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                      .map((row) => (
-                        <StyledTableRow key={row.studentname}>
-                          <StyledTableCell component="th" scope="row">
-                            {row.studentname}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.phoneNumber}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.email}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.dateOfJoining}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.highestQualification}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.selectCourse}
-                          </StyledTableCell>
-                          <StyledTableCell
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-evenly",
-                            }}
-                          >
-                            {/* edit button */}
-                            <Button
-                              color="success"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleEdit(row._id);
-                              }}
-                            >
-                              <EditIcon />
-                            </Button>
-
-                            {/* delete button */}
-                            <Button
-                              color="error"
-                              onClick={handleClickDeleteOpen}
-                            >
-                              <DeleteIcon />
-                            </Button>
-                            <Dialog
-                              open={deleteOpen}
-                              onClose={handleDeleteClose}
-                              aria-labelledby="alert-dialog-title"
-                              aria-describedby="alert-dialog-description"
-                            >
-                              <DialogTitle id="alert-dialog-title">
-                                {"Are you sure to delete the student?"}
-                              </DialogTitle>
-                              <DialogContent>
-                                <DialogContentText id="alert-dialog-description">
-                                  Are you sure, because this procedure cannot be
-                                  undo!!!
-                                </DialogContentText>
-                              </DialogContent>
-                              <DialogActions>
-                                <Button onClick={handleDeleteClose}>
-                                  <Button>Cancel</Button>
-                                </Button>
-                                <Button
-                                  onClick={() => handleDelete(row._id)}
-                                  autoFocus
-                                >
-                                  <Button>Sure</Button>
-                                </Button>
-                              </DialogActions>
-                            </Dialog>
-
-                            {/* view button */}
-                            <Button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleView(row._id);
-                              }}
-                            >
-                              <RemoveRedEyeIcon />
-                            </Button>
-                            <Dialog
-                              open={idOpen}
-                              onClose={handleIdClose}
-                              aria-labelledby="alert-dialog-title"
-                              aria-describedby="alert-dialog-description"
-                            >
-                              <DialogContent>
-                                <StudentId
-                                  sendStudentData={editedStudentData}
-                                />
-                              </DialogContent>
-                            </Dialog>
-                          </StyledTableCell>
-                        </StyledTableRow>
-                      ))}
-                  </TableBody>
-                  <TableFooter>
-                    <TableRow>
-                      <TablePagination
-                        color="secondary"
-                        rowsPerPageOptions={[5, 10, 15, 20]}
-                        colSpan={7}
-                        count={userData.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        sx={{ backgroundColor: "#D6CFCD" }}
-                      />
-                    </TableRow>
-                  </TableFooter>
-                </Table>
-              </TableContainer>
-            </Box>
-          </Box>
+          <TableContainer component={Card}>
+            <Table aria-label="customized table">
+              <TableHead>{getTableHeads()}</TableHead>
+              <TableBody>
+                {userData.map((row, index) => getTableBody(row, index))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </>
       )}
     </Box>

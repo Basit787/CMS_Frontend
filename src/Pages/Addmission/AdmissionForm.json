@@ -1,0 +1,101 @@
+{
+  "heading": "Addmission Form",
+  "heading2": "Update Form",
+  "fields": [
+    {
+      "label": "Name",
+      "name": "studentname",
+      "type": "text",
+      "placeholder": "Enter Your name"
+    },
+    {
+      "label": "Student Id",
+      "name": "studentId",
+      "type": "text",
+      "placeholder": "Enter Your Student Id"
+    },
+    {
+      "label": "Password",
+      "name": "password",
+      "type": "password",
+      "placeholder": "Enter Your Password"
+    },
+    {
+      "label": "Date of Birth",
+      "name": "dateOfBirth",
+      "type": "date",
+      "focused": true
+    },
+    {
+      "label": "Phone Number",
+      "name": "phoneNumber",
+      "type": "text",
+      "placeholder": "Enter Your Phone Number"
+    },
+    {
+      "label": "E-Mail",
+      "name": "email",
+      "type": "email",
+      "placeholder": "Enter Your E-Mail"
+    },
+    {
+      "label": "Phone Number",
+      "name": "phoneNumber",
+      "type": "text",
+      "placeholder": "Enter Your Phone Number"
+    },
+    {
+      "label": "Select Gender",
+      "name": "gender",
+      "type": "select",
+      "options": [
+        { "name": "Male", "value": "male" },
+        { "name": "Female", "value": "female" }
+      ]
+    },
+    {
+      "label": "Date of Joining",
+      "name": "dateOfJoining",
+      "type": "date",
+      "focused": true
+    },
+    {
+      "label": "Aadhaar-card",
+      "name": "aadharCard",
+      "type": "text",
+      "placeholder": "Enter Your Aadhar Card Number"
+    },
+    {
+      "label": "Pan-Card (optional)",
+      "name": "panCard",
+      "type": "text",
+      "placeholder": "Enter Your Pan-Card number"
+    },
+    {
+      "label": "Highest Qualification",
+      "name": "highestQualification",
+      "type": "select",
+      "options": [
+        { "name": "Male", "value": "male" },
+        { "name": "Female", "value": "female" }
+      ]
+    },
+    {
+      "label": "Select Course",
+      "name": "selectCourse",
+      "type": "select",
+      "options": [
+        { "name": "Male", "value": "male" },
+        { "name": "Female", "value": "female" }
+      ]
+    },
+    {
+      "label": "Pan-Card (optional)",
+      "name": "address",
+      "type": "textarea",
+      "placeholder": "Enter your address"
+    }
+  ],
+  "btn": "Submit",
+  "btn2": "Update"
+}

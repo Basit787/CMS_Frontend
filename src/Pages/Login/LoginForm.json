@@ -1,0 +1,19 @@
+{
+  "heading": "Login",
+  "fields": [
+    {
+      "label": "Email",
+      "name": "email",
+      "type": "email",
+      "placeholder": "Enter your email-id"
+    },
+    {
+      "label": "Password",
+      "name": "password",
+      "type": "password",
+      "placeholder": "Enter your password"
+    }
+  ],
+  "btn": "Submit",
+  "btn2": "Update"
+}
