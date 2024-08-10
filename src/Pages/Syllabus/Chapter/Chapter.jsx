@@ -24,6 +24,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { GridExpandMoreIcon } from "@mui/x-data-grid";
 import { chapterApi, Endpoints } from "../../../apis/apiContsants";
 import { useDispatch } from "react-redux";
+import { setSnackBarOpen, SnackbarType } from "../../../reducers/SnacbarSlice";
+import { setDialogOpen } from "../../../reducers/DialogBoxSlice";
 
 const Chapter = () => {
   const location = useLocation();
@@ -66,16 +68,36 @@ const Chapter = () => {
       .then(() => {
         console.log("chapter deleted successfully");
         getChapters();
+        dispatch(setSnackBarOpen({
+          title:'The student deleted successfully',
+          type:SnackbarType.success
+        }))
       })
       .catch((err) => {
         console.log("chapter not deleted" + err);
+        dispatch(setSnackBarOpen({
+          title:'Failed to delete the student!!!',
+          type:SnackbarType.error
+        }))
       });
   };
 
   //Delete popup
 
   const handleDeleteOpen = (id) => {
-    // dispatch; //use dispatch to delete using popup
+    dispatch(setDialogOpen({
+      title: "Are you sure that you want to delete the student!!!",
+    message: "If you delete the above above student it cant be undo!!! ",
+    response: (ActionType) => {
+      if(ActionType==="positive"){
+        handleDeleteChapter(id)
+        
+      }
+      else{
+        return
+      }
+    },
+    }))
   };
 
   //edit
