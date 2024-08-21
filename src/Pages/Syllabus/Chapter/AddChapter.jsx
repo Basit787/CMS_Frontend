@@ -2,13 +2,15 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Box, Button, Divider, Paper, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {Endpoints} from "../../../../apis/apiContsants";
-import instance from "../../../../apis/apiRequest";
-import "./AddChapter.scss";
+import { Endpoints } from "../../../apis/apiContsants";
+import instance from "../../../apis/apiRequest";
+import useSnackBarStore, { SnackbarType } from "../../../stores/SnacbarStore";
 
 const AddChapter = () => {
   const location = useLocation();
-  const { courseId, editId } = location.state;
+  const { courseId, editId } = location?.state;
+
+  const { openSnackbar } = useSnackBarStore((state) => state);
 
   //chapterForm form
   const [chapterForms, setChapterForms] = useState({
@@ -37,43 +39,52 @@ const AddChapter = () => {
   };
 
   //Add chapter
-  const addChapter = (chapterData) => {
-    instance
-      .post(Endpoints.addChapterApi, chapterData)
-      .then((res) => {
-        console.log("chapter added", res.data.data);
-        navigate(-1);
-      })
-      .catch((err) => {
-        console.log("chapter didnt added!!! " + err);
+  const addChapter = async (chapterData) => {
+    try {
+      const res = await instance.post(Endpoints.addChapterApi, chapterData);
+      console.log("chapter added", res.data.data);
+      openSnackbar({
+        message: "Chapter added successfully",
+        type: SnackbarType.success,
       });
+      // navigate();
+    } catch (err) {
+      console.log("chapter didnt added!!! " + err);
+      openSnackbar({
+        message: "failed to added the chapter !!!",
+        type: SnackbarType.error,
+      });
+    }
   };
 
   //updating the chapter
 
-  const updateChapter = (data) => {
-    instance
-      .post(Endpoints.updateChapterApi, data)
-      .then((res) => {
-        console.log("course updated successfully", res.data.data);
-        setChapterForms(res.data.data);
-        navigate(-1);
-      })
-      .catch((err) => {
-        console.log("cant updated the student", err);
+  const updateChapter = async (data) => {
+    try {
+      const res = await instance.post(Endpoints.updateChapterApi, data);
+      console.log("course updated successfully", res.data.data);
+      setChapterForms(res.data.data);
+      openSnackbar({
+        message: "Chapter updated successfully",
+        type: SnackbarType.success,
       });
+    } catch (err) {
+      console.log("cant updated the student", err);
+      openSnackbar({
+        message: "Failed to update the chapter!!!",
+        type: SnackbarType.error,
+      });
+    }
   };
 
-  const editChapter = () => {
-    instance
-      .get(Endpoints.chapterApi + editId)
-      .then((res) => {
-        console.log("single chapter data received:", res.data.data);
-        setChapterForms(res.data.data);
-      })
-      .catch((err) => {
-        console.log("cant get the single chapter data: ", err);
-      });
+  const editChapter = async () => {
+    try {
+      const res = await instance.get(Endpoints.chapterApi + editId);
+      console.log("single chapter data received:", res.data.data);
+      setChapterForms(res.data.data);
+    } catch (err) {
+      console.log("cant get the single chapter data: ", err);
+    }
   };
 
   //submiting and updating the course
@@ -82,23 +93,20 @@ const AddChapter = () => {
     const data = {
       ...chapterForms,
     };
-
     editId ? updateChapter(data) : addChapter(data);
     navigate(-1);
   };
 
   // adding concepts in form
-
   const [addConcept, setAddConcept] = useState([]);
-
   const handleConcepts = (event) => {
     setAddConcept(event.target.value);
   };
-
   const clickConcept = () => {
     chapterForms.concepts.push(addConcept);
     setAddConcept("");
   };
+
   //delete the concepts
   const deleteConcepts = (delCon) => {
     const delConcept = [...chapterForms.concepts];
@@ -117,7 +125,6 @@ const AddChapter = () => {
   };
 
   //adding references in form
-
   const [addReferences, setAddReferences] = useState([]);
   const handleReferences = (e) => {
     setAddReferences(e.target.value);
@@ -126,6 +133,7 @@ const AddChapter = () => {
     chapterForms.references.push(addReferences);
     setAddReferences("");
   };
+
   //delete the refrences
   const deleteReferences = (delRef) => {
     const delReferences = [...chapterForms.references];

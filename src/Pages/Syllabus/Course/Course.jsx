@@ -7,79 +7,93 @@ import Button from "@mui/material/Button";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Endpoints } from "../../../apis/apiContsants";
 import instance from "../../../apis/apiRequest";
 import DialogBox from "../../../components/Dialog";
-import { setDialogOpen } from "../../../reducers/DialogBoxSlice";
-import { setSnackBarOpen, SnackbarType } from "../../../reducers/SnacbarSlice";
 import CourseAdd from "./CourseAdd";
+import useDialogBoxStore from "../../../stores/DialogBoxStore";
+import useSnackBarStore, { SnackbarType } from "../../../stores/SnacbarStore";
 
 const Course = () => {
   const [courseData, setCourseData] = useState([]);
   const [editedCourse, setEditedCourse] = useState(); //props send
   const [open, setOpen] = useState(false); //dialog box
 
+  const { openDialog } = useDialogBoxStore((state) => state);
+  const { openSnackbar } = useSnackBarStore((state) => state);
+
   useEffect(() => {
     getCourseData();
   }, []);
 
-  const dispatch = useDispatch();
-
   //getCourse
-  const getCourseData = () => {
-    instance
-      .get(Endpoints.courseApi, { params: courseData._id })
-      .then((res) => {
-        console.log("get course", res.data.data);
-        setCourseData(res.data.data);
-      })
-      .catch((err) => {
-        console.log("cant get the course " + err);
+  const getCourseData = async () => {
+    try {
+      const res = await instance.get(Endpoints.courseApi, {
+        params: courseData._id,
       });
+      console.log("get course", res.data.data);
+      setCourseData(res.data.data);
+    } catch (err) {
+      console.log("cant get the course " + err);
+      openSnackbar({
+        message: "Failed to fetch courses",
+        type: SnackbarType.error,
+      });
+    }
   };
   //add course
-  const addCourseData = (params) => {
-    instance
-      .post(Endpoints.addCourseApi, params)
-      .then((res) => {
-        console.log("get course", res.data.data);
-        getCourseData();
-        handleClose();
-      })
-      .catch((err) => {
-        console.log("can't add the course " + err);
+  const addCourseData = async (params) => {
+    try {
+      const res = await instance.post(Endpoints.addCourseApi, params);
+      console.log("get course", res.data.data);
+      getCourseData();
+      handleClose();
+      openSnackbar({
+        message: "Course added successfully",
+        type: SnackbarType.success,
       });
+    } catch (err) {
+      console.log("can't add the course " + err);
+      openSnackbar({
+        message: "failed to add the course",
+        type: SnackbarType.error,
+      });
+    }
   };
 
   //updateCourse
-  const updateCourseData = (params) => {
-    instance
-      .post(Endpoints.updateCourseApi, params)
-      .then((res) => {
-        console.log("course updated", res.data.data);
-        getCourseData();
-        handleClose();
-      })
-      .catch((err) => {
-        console.log("can't update the course " + err);
+  const updateCourseData = async (params) => {
+    try {
+      const res = await instance.post(Endpoints.updateCourseApi, params);
+
+      console.log("course updated", res.data.data);
+      getCourseData();
+      handleClose();
+      openSnackbar({
+        message: "Course updated successfully",
+        type: SnackbarType.success,
       });
+    } catch (err) {
+      console.log("can't update the course " + err);
+      openSnackbar({
+        message: "Failed to update the course",
+        type: SnackbarType.error,
+      });
+    }
   };
 
   //editCourse by getting single _id
-  const editCourseData = (params) => {
+  const editCourseData = async (params) => {
     setOpen(true);
-    instance
-      .get(Endpoints.courseApi + params)
-      .then((res) => {
-        console.log("get single course", res.data.data);
-        setEditedCourse(res.data.data);
-        // handleClose();
-      })
-      .catch((err) => {
-        console.log("can't add the  course " + err);
-      });
+    try {
+      const res = await instance.get(Endpoints.courseApi + params);
+      console.log("get single course", res.data.data);
+      setEditedCourse(res.data.data);
+    } catch (err) {
+      console.log("can't add the  course " + err);
+    }
   };
 
   //deleteCourse
@@ -137,30 +151,24 @@ const Course = () => {
 
   //deletecourse pop-up
   const handleDeleteClickOpen = (courseId) => {
-    dispatch(
-      setDialogOpen({
-        title: "Confirm Deletion",
-        message: "Do you really want to delete the course",
-        response: (ActionType) => {
-          if (ActionType === "positive") {
-            deleteCourseData(courseId);
-            dispatch(
-              setSnackBarOpen({
-                message: "Course deleted successfully",
-                type: SnackbarType.success,
-              })
-            );
-          } else {
-            dispatch(
-              setSnackBarOpen({
-                message: "Failed to delete the course",
-                type: SnackbarType.error,
-              })
-            );
-          }
-        },
-      })
-    );
+    openDialog({
+      title: "Confirm Deletion",
+      message: "Do you really want to delete the course",
+      response: (ActionType) => {
+        if (ActionType === "positive") {
+          deleteCourseData(courseId);
+          openSnackbar({
+            message: "Course deleted successfully",
+            type: SnackbarType.success,
+          });
+        } else {
+          openSnackbar({
+            message: "Failed to delete the course",
+            type: SnackbarType.error,
+          });
+        }
+      },
+    });
   };
 
   const getMapData = (item, index) => {
@@ -215,12 +223,14 @@ const Course = () => {
             >
               Add Course
             </Button>
-            <DialogBox openTrue={open} closeTrue={() => setOpen(false)}>
-              <CourseAdd
-                onSubmit={submitCourseForm}
-                sendCourse={editedCourse}
-              />
-            </DialogBox>
+            {open && (
+              <DialogBox closeTrue={() => setOpen(false)}>
+                <CourseAdd
+                  onSubmit={submitCourseForm}
+                  sendCourse={editedCourse}
+                />
+              </DialogBox>
+            )}
           </Box>
         </Toolbar>
       </AppBar>

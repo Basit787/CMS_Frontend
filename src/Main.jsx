@@ -1,7 +1,6 @@
 import React from "react";
-import SideBar from "./components/SideBar";
-import Dashboard from "./Pages/Dashboard/Dashboard";
 import { Outlet } from "react-router-dom";
+import SideBar from "./components/SideBar";
 const Main = () => {
   return (
     <SideBar>

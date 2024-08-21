@@ -1,33 +1,31 @@
-import Alert from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
 import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setSnackBarClose } from "../reducers/SnacbarSlice";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import useSnackBarStore from "../stores/SnacbarStore";
 
 export default function CMSnackBar() {
-  const snackbar = useSelector((state) => state.Snackbar);
-  const dispatch = useDispatch();
+  const { snacbarData, closeSnackbar } = useSnackBarStore((state) => state);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-    dispatch(setSnackBarClose());
+    closeSnackbar();
   };
 
   return (
     <Snackbar
-      open={snackbar?.open}
+      open={snacbarData?.open}
       autoHideDuration={3000}
       onClose={handleClose}
     >
       <Alert
         onClose={handleClose}
-        severity={snackbar?.type}
+        severity={snacbarData?.type}
         variant="filled"
         sx={{ width: "100%" }}
       >
-        {snackbar?.message}
+        {snacbarData?.message}
       </Alert>
     </Snackbar>
   );

@@ -27,7 +27,7 @@ const CMPassword = (props) => {
       </InputLabel>
       <OutlinedInput
         id="outlined-adornment-password"
-        type={showPassword ? props.type === "text" : props.type}
+        type={showPassword ? "text" : "password"}
         endAdornment={
           <InputAdornment position="end">
             <IconButton

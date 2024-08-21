@@ -1,35 +1,29 @@
-import React, { useState } from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
-import MuiAppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
+import { AccountCircle, Dashboard } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import LogoutIcon from "@mui/icons-material/Logout";
+import MenuIcon from "@mui/icons-material/Menu";
+import { Button } from "@mui/material";
+import MuiAppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import { styled, useTheme } from "@mui/material/styles";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { logout } from "../reducers/LoginSlice";
-import { AccountCircle, Dashboard, Description } from "@mui/icons-material";
-import { Button } from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import { ActionType, setDialogOpen } from "../reducers/DialogBoxSlice";
-import { setSnackBarOpen, SnackbarType } from "../reducers/SnacbarSlice";
+import useDialogBoxStore, { ActionType } from "../stores/DialogBoxStore";
+import useLoginStore from "../stores/LoginStore";
+import useSnackBarStore, { SnackbarType } from "../stores/SnacbarStore";
 
 const drawerWidth = 240;
 
@@ -91,31 +85,26 @@ export default function PersistentDrawerLeft({ children }) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  const dispatch = useDispatch();
+  const { openDialog } = useDialogBoxStore((state) => state);
+  const { logout } = useLoginStore((state) => state);
+  const { openSnackbar } = useSnackBarStore((state) => state);
 
   const handleOpenDialog = () => {
-    dispatch(
-      setDialogOpen({
-        title: "Do you want to logout!!!",
-        message: "Do you really want to LogOut, if yes click agree",
-        response: (actionType) => {
-          if (actionType === ActionType.positive) {
-            console.log("Logout succesfull");
-            dispatch(logout());
-          }
-          if (actionType === ActionType.negative) {
-            console.log("negative");
-            dispatch(
-              setSnackBarOpen({
-                type: SnackbarType.error,
-                message: "Failed to logout!!!",
-              })
-            );
-          }
-        },
-      })
-    );
+    openDialog({
+      title: "Do you want to logout!!!",
+      message: "Do you really want to LogOut, if yes click agree",
+      response: (actionType) => {
+        if (actionType === ActionType.positive) {
+          logout();
+        }
+        if (actionType === ActionType.negative) {
+          openSnackbar({
+            type: SnackbarType.error,
+            message: "Failed to logout!!!",
+          });
+        }
+      },
+    });
   };
 
   const menuItems = [

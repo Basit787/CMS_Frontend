@@ -1,3 +1,5 @@
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Accordion,
   AccordionDetails,
@@ -6,98 +8,87 @@ import {
   Box,
   Button,
   Card,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Link,
   Toolbar,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import instance from "../../../apis/apiRequest";
-import { useEffect } from "react";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { GridExpandMoreIcon } from "@mui/x-data-grid";
-import { chapterApi, Endpoints } from "../../../apis/apiContsants";
-import { useDispatch } from "react-redux";
-import { setSnackBarOpen, SnackbarType } from "../../../reducers/SnacbarSlice";
-import { setDialogOpen } from "../../../reducers/DialogBoxSlice";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Endpoints } from "../../../apis/apiContsants";
+import instance from "../../../apis/apiRequest";
+import useDialogBoxStore from "../../../stores/DialogBoxStore";
+import useSnackBarStore, { SnackbarType } from "../../../stores/SnacbarStore";
 
 const Chapter = () => {
   const location = useLocation();
-  const { courseTitle, courseId } = location.state;
+  const { courseTitle, courseId } = location?.state;
   //Syllabus data
   const [chapter, setChapter] = useState([]);
-
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const { openDialog } = useDialogBoxStore((state) => state);
+  const { openSnackbar } = useSnackBarStore((state) => state);
 
   //navigate to add course form
   const openChapterForm = () => {
     navigate("/addChapter", { state: { courseId } });
   };
 
-  //useeffect for getChapter
+  //useffect for getChapter
   useEffect(() => {
     getChapters();
   }, []);
 
   //get chapter
-  const getChapters = () => {
-    instance
-      .get(Endpoints.chapterApi, { params: { courseId: courseId } })
-      .then((res) => {
-        console.log("get chapter", res.data.data);
-        setChapter(res.data.data);
-      })
-      .catch((err) => {
-        console.log("cant get the chapter " + err);
+  const getChapters = async () => {
+    try {
+      const res = await instance.get(Endpoints.chapterApi, {
+        params: { courseId: courseId },
       });
+      console.log("get chapter", res.data.data);
+      setChapter(res.data.data);
+    } catch (err) {
+      console.log("cant get the chapter " + err);
+      openSnackbar({
+        message: "Failed to fetch the course!!!",
+        type: SnackbarType.error,
+      });
+    }
   };
 
   //delete button
-
-  const handleDeleteChapter = (chap) => {
-    instance
-      .delete(Endpoints.chapterApi + chap)
-      .then(() => {
-        console.log("chapter deleted successfully");
-        getChapters();
-        dispatch(setSnackBarOpen({
-          title:'The student deleted successfully',
-          type:SnackbarType.success
-        }))
-      })
-      .catch((err) => {
-        console.log("chapter not deleted" + err);
-        dispatch(setSnackBarOpen({
-          title:'Failed to delete the student!!!',
-          type:SnackbarType.error
-        }))
+  const handleDeleteChapter = async (chap) => {
+    try {
+      await instance.delete(Endpoints.chapterApi + chap);
+      console.log("chapter deleted successfully");
+      getChapters();
+      openSnackbar({
+        message: "The chapter deleted successfully",
+        type: SnackbarType.success,
       });
+    } catch (err) {
+      console.log("chapter not deleted" + err);
+      openSnackbar({
+        message: "Failed to delete the chapter!!!",
+        type: SnackbarType.error,
+      });
+    }
   };
 
   //Delete popup
-
   const handleDeleteOpen = (id) => {
-    dispatch(setDialogOpen({
-      title: "Are you sure that you want to delete the student!!!",
-    message: "If you delete the above above student it cant be undo!!! ",
-    response: (ActionType) => {
-      if(ActionType==="positive"){
-        handleDeleteChapter(id)
-        
-      }
-      else{
-        return
-      }
-    },
-    }))
+    openDialog({
+      title: "Are you sure that you want to delete the chapter!!!",
+      message: "If you delete the above chapter it cant be undo!!! ",
+      response: (ActionType) => {
+        if (ActionType === "positive") {
+          handleDeleteChapter(id);
+        } else if (ActionType === "negative") {
+          console.log("Failed to perform action");
+        }
+      },
+    });
   };
 
   //edit

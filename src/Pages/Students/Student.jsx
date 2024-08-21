@@ -14,17 +14,12 @@ import {
 import { styled } from "@mui/material/styles";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { Endpoints } from "../../apis/apiContsants";
 import instance from "../../apis/apiRequest";
 import Appbar from "../../components/Appbar";
 import DialogBox from "../../components/Dialog";
-import { setDialogOpen } from "../../reducers/DialogBoxSlice";
-import {
-  setSnackBarClose,
-  setSnackBarOpen,
-  SnackbarType,
-} from "../../reducers/SnacbarSlice";
+import useDialogBoxStore from "../../stores/DialogBoxStore";
+import useSnackBarStore, { SnackbarType } from "../../stores/SnacbarStore";
 import Addmission from "../Addmission/Addmission";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -51,6 +46,9 @@ const Students = () => {
   const [userData, setData] = useState([]);
   const [editedStudentData, setEditedStudentData] = useState();
 
+  const { openDialog } = useDialogBoxStore((state) => state);
+  const { openSnackbar } = useSnackBarStore((state) => state);
+
   //opendialog
   const [open, setOpen] = useState(false);
 
@@ -63,116 +61,90 @@ const Students = () => {
     getStudentsData();
   }, []);
 
-  const dispatch = useDispatch();
-
   //get student
-  const getStudentsData = () => {
-    instance
-      .get(Endpoints.student)
-      .then((res) => {
-        console.log("get students", res.data.data);
-        setData(res.data.data);
-      })
-      .catch((err) => {
-        console.log("cant get the student " + err);
-        dispatch(
-          setSnackBarOpen({
-            type: SnackbarType.error,
-            message: "Failed to fetched student data!!!",
-          })
-        );
+  const getStudentsData = async () => {
+    try {
+      const res = await instance.get(Endpoints.student);
+      console.log("get students", res.data.data);
+      setData(res.data.data);
+    } catch (err) {
+      console.log("cant get the student " + err);
+      openSnackbar({
+        type: SnackbarType.error,
+        message: "Failed to fetched student data!!!",
       });
+    }
   };
 
   //Add student
-  const addStudent = (params) => {
-    instance
-      .post(Endpoints.registerStudent, params)
-      .then((res) => {
-        console.log("student added", res.data.data);
-        getStudentsData();
-        handleClose();
-        dispatch(
-          setSnackBarOpen({
-            type: SnackbarType.success,
-            message: "Student added successfully",
-          })
-        );
-      })
-      .catch((err) => {
-        console.log("student didnt added!!! " + err);
-        dispatch(
-          setSnackBarClose({
-            type: SnackbarType.error,
-            message: "Failed to add student!!!",
-          })
-        );
+  const addStudent = async (params) => {
+    try {
+      const res = await instance.post(Endpoints.registerStudent, params);
+      console.log("student added", res.data.data);
+      getStudentsData();
+      handleClose();
+      openSnackbar({
+        type: SnackbarType.success,
+        message: "Student added successfully",
       });
+    } catch (err) {
+      console.log("student didnt added!!! " + err);
+      openSnackbar({
+        type: SnackbarType.error,
+        message: "Failed to add student!!!",
+      });
+    }
   };
 
   //updateStudent
-  const updateStudent = (updateID) => {
-    instance
-      .post(Endpoints.updateStudents, updateID)
-      .then((res) => {
-        console.log("updated Succesfully", res.data.data);
-        setEditedStudentData(res.data.data);
-        handleClose();
-        dispatch(
-          setSnackBarOpen({
-            type: SnackbarType.success,
-            message: "Student updated successfully",
-          })
-        );
-      })
-      .catch((err) => {
-        console.error("cant updated!!! ", err);
-        dispatch(
-          setSnackBarClose({
-            type: SnackbarType.error,
-            message: "Failed to update student!!!",
-          })
-        );
+  const updateStudent = async (updateID) => {
+    try {
+      const res = await instance.post(Endpoints.updateStudents, updateID);
+      console.log("updated Succesfully", res.data.data);
+      setEditedStudentData(res.data.data);
+      handleClose();
+      openSnackbar({
+        type: SnackbarType.success,
+        message: "Student updated successfully",
       });
+    } catch (err) {
+      console.error("cant updated!!! ", err);
+      openSnackbar({
+        type: SnackbarType.error,
+        message: "Failed to update student!!!",
+      });
+    }
   };
 
   //edit button
-  const handleEdit = (studentId) => {
+  const handleEdit = async (studentId) => {
     setOpen(true);
-    instance
-      .get(Endpoints.student + studentId)
-      .then((res) => {
-        console.log("single data occured " + res.data.data);
-        setEditedStudentData(res.data.data);
-      })
-      .catch((err) => {
-        console.log("single data not occurred" + err);
-      });
+    try {
+      const res = await instance.get(Endpoints.student + studentId);
+      console.log("single data occured " + res.data.data);
+      setEditedStudentData(res.data.data);
+    } catch (err) {
+      console.log("single data not occurred" + err);
+    }
   };
 
   //delete button
-  const handleDelete = (params) => {
-    instance
-      .delete(Endpoints.student + params)
-      .then((res) => {
-        console.log("student deleted successfully" + res.data);
-        getStudentsData();
-        dispatch(
-          setSnackBarOpen({
-            type: SnackbarType.success,
-            message: "Student deleted successfully",
-          })
-        );
-      })
-      .catch((err) => {
-        console.log("not deleted" + err);
-        dispatch(
-          setSnackBarClose({
-            type: SnackbarType.error,
-            message: "Failed to delete student!!!",
-          })
-        );
+  const handleDelete = async (params) => {
+    try {
+      const res = await instance.delete(Endpoints.student + params);
+      console.log("student deleted successfully" + res.data);
+      getStudentsData();
+      openSnackbar({
+        type: SnackbarType.success,
+        message: "Student deleted successfully",
       });
+    } catch (error) {
+      console.log("not deleted" + error);
+      openSnackbar({
+        type: SnackbarType.error,
+        message: "Failed to delete student!!!",
+      });
+    }
   };
 
   //Validation
@@ -189,11 +161,7 @@ const Students = () => {
       const params = {
         ...formData,
       };
-      if (editedStudentData) {
-        updateStudent(params);
-      } else {
-        addStudent(params);
-      }
+      editedStudentData ? updateStudent(params) : addStudent(params);
     } else {
       console.log("validation failed");
     }
@@ -255,32 +223,25 @@ const Students = () => {
 
   //delete popup
   const handleClickDeleteOpen = (deleteId) => {
-    console.log("delete id", deleteId);
-    dispatch(
-      setDialogOpen({
-        title: "Are you sure to delete the student?",
-        message: "Are you sure, because this procedure cannot be undo!!!",
-        response: (ActionType) => {
-          if (ActionType === "positive") {
-            handleDelete(deleteId);
-            dispatch(
-              setSnackBarOpen({
-                type: SnackbarType.success,
-                message: "Student deleted successfully",
-              })
-            );
-          }
-          if (ActionType === "negative") {
-            dispatch(
-              setSnackBarOpen({
-                type: SnackbarType.error,
-                message: "Failed to delete student",
-              })
-            );
-          }
-        },
-      })
-    );
+    openDialog({
+      title: "Are you sure to delete the student?",
+      message: "Are you sure, because this procedure cannot be undo!!!",
+      response: (ActionType) => {
+        if (ActionType === "positive") {
+          handleDelete(deleteId);
+          openSnackbar({
+            type: SnackbarType.success,
+            message: "Student deleted successfully",
+          });
+        }
+        if (ActionType === "negative") {
+          openSnackbar({
+            type: SnackbarType.error,
+            message: "Failed to delete student",
+          });
+        }
+      },
+    });
   };
 
   return (
@@ -290,7 +251,7 @@ const Students = () => {
           Add Student
         </Button>
         {open && (
-          <DialogBox openTrue={open} closeTrue={(event) => setOpen(event)}>
+          <DialogBox closeTrue={(event) => setOpen(event)}>
             <Addmission
               onSubmit={onSubmitClick}
               sendStudentData={editedStudentData}

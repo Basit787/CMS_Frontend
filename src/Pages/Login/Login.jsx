@@ -1,36 +1,32 @@
 import { Box } from "@mui/material";
-import { useDispatch } from "react-redux";
 import { Endpoints } from "../../apis/apiContsants";
 import instance from "../../apis/apiRequest";
 import CMDynamicForm from "../../components/CMDynamicForm";
-import { login } from "../../reducers/LoginSlice";
-import { setSnackBarOpen, SnackbarType } from "../../reducers/SnacbarSlice";
+import useLoginStore from "../../stores/LoginStore";
+import useSnackBarStore, { SnackbarType } from "../../stores/SnacbarStore";
 import "./Login.scss";
 import LoginFields from "./LoginForm.json";
 
 const Login = () => {
-  const dispatch = useDispatch();
+  const { login } = useLoginStore((state) => state);
+  const { openSnackbar } = useSnackBarStore((state) => state);
 
-  const handleSubmit = (event) => {
-    instance
-      .post(Endpoints.student_Login, {
-        email: event.email,
-        password: event.password,
-      })
-      .then((response) => {
-        const token = response.data.data.token;
-        localStorage.setItem("token", token);
-        dispatch(login(response.data.data));
-      })
-      .catch((error) => {
-        console.log("login failed" + error);
-        dispatch(
-          setSnackBarOpen({
-            type: SnackbarType.error,
-            message: "Failed to login",
-          })
-        );
+  const handleSubmit = async (submitData) => {
+    try {
+      const userData = await instance.post(Endpoints.student_Login, {
+        email: submitData.email,
+        password: submitData.password,
       });
+      const token = userData.data.data.token;
+      localStorage.setItem("token", token);
+      login(userData.data.data);
+    } catch (error) {
+      console.log("login failed" + error);
+      openSnackbar({
+        type: SnackbarType.error,
+        message: "Failed to login",
+      });
+    }
   };
   return (
     <Box className="flex justify-center items-center min-h-screen bgImg ">

@@ -1,11 +1,11 @@
-import { useSelector } from "react-redux";
 import Main from "./Main";
-import CMSnackBar from "./components/CMSnackbar";
 import Login from "./Pages/Login/Login";
 import CMDialogBox from "./components/CMDialogPopup";
+import CMSnackBar from "./components/CMSnackbar";
+import useLoginStore from "./stores/LoginStore";
 
 function App() {
-  const login = useSelector((state) => state.Login.token);
+  const login = useLoginStore((state) => state.loginData?.token);
 
   return (
     <div>

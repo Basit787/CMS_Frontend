@@ -3,14 +3,10 @@ import CheckIcon from "@mui/icons-material/Check";
 import CoPresentIcon from "@mui/icons-material/CoPresent";
 import DoNotDisturbAltIcon from "@mui/icons-material/DoNotDisturbAlt";
 import { Box, Card } from "@mui/material";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { Endpoints } from "../../apis/apiContsants";
 import instance from "../../apis/apiRequest";
-import { setSnackBarOpen, SnackbarType } from "../../reducers/SnacbarSlice";
+import useSnackBarStore, { SnackbarType } from "../../stores/SnacbarStore";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState([]);
@@ -19,21 +15,19 @@ const Dashboard = () => {
     getDashboardData();
   }, []);
 
-  const dispatch = useDispatch();
+  const { openSnackbar } = useSnackBarStore((state) => state);
 
-  const getDashboardData = () => {
-    instance
-      .get(Endpoints.dashboardApi)
-      .then((res) => setDashboardData(res.data.data))
-      .catch((err) => {
-        console.log("Cant get the total students in Dashboard" + err);
-        dispatch(
-          setSnackBarOpen({
-            type: SnackbarType.error,
-            message: "Failed to fetched data!!!",
-          })
-        );
+  const getDashboardData = async () => {
+    try {
+      const getData = await instance.get(Endpoints.dashboardApi);
+      setDashboardData(getData.data.data);
+    } catch (error) {
+      console.log("Cant get the total students in Dashboard" + error);
+      openSnackbar({
+        type: SnackbarType.error,
+        message: "Failed to fetched data!!!",
       });
+    }
   };
 
   // mapping dashboard
@@ -82,11 +76,6 @@ const Dashboard = () => {
             </Card>
           ))}
         </Box>
-      </Box>
-      <Box>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateCalendar />
-        </LocalizationProvider>
       </Box>
     </Box>
   );

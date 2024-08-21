@@ -11,7 +11,7 @@ export default function DialogBox(props) {
 
   return (
     <Dialog
-      open={props.openTrue}
+      open={true}
       onClose={handleClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
