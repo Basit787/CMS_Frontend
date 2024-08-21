@@ -14,6 +14,7 @@ import DialogBox from "../../../components/Dialog";
 import CourseAdd from "./CourseAdd";
 import useDialogBoxStore from "../../../stores/DialogBoxStore";
 import useSnackBarStore, { SnackbarType } from "../../../stores/SnacbarStore";
+import useHeadingStore from "../../../stores/HeadingStore";
 
 const Course = () => {
   const [courseData, setCourseData] = useState([]);
@@ -150,9 +151,9 @@ const Course = () => {
   };
 
   //deletecourse pop-up
-  const handleDeleteClickOpen = (courseId) => {
+  const handleDeleteClickOpen = (courseId, courseName) => {
     openDialog({
-      title: "Confirm Deletion",
+      title: `Delete ${courseName}`,
       message: "Do you really want to delete the course",
       response: (ActionType) => {
         if (ActionType === "positive") {
@@ -171,12 +172,29 @@ const Course = () => {
     });
   };
 
+  const getTitle = (title) => {
+    if (title.length > 10) {
+      return title.slice(0, 10) + "...";
+    }
+    return title;
+  };
+
+  const getDescription = (description) => {
+    if (description.length > 20) {
+      return description.slice(0, 40) + "...";
+    }
+    return description;
+  };
+
   const getMapData = (item, index) => {
     return (
-      <Card key={index} className="m-2 p-2 flex  justify-between items-center">
+      <Card
+        key={index}
+        className="m-2 p-2 md:flex  justify-between items-center grid grid-cols-2"
+      >
         <Box>
-          <h1>{item.title}</h1>
-          <p>{item.description}</p>
+          <h1>{getTitle(item.title)}</h1>
+          <p className="break-words">{getDescription(item.description)}</p>
         </Box>
         <Box className="flex flex-col m-2 md:flex-row">
           <Button
@@ -224,7 +242,7 @@ const Course = () => {
               Add Course
             </Button>
             {open && (
-              <DialogBox closeTrue={() => setOpen(false)}>
+              <DialogBox close={() => setOpen(false)}>
                 <CourseAdd
                   onSubmit={submitCourseForm}
                   sendCourse={editedCourse}

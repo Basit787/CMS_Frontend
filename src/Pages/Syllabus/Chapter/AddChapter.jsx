@@ -1,6 +1,6 @@
+import React, { useState, useEffect } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Box, Button, Divider, Paper, TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Box, Button, Paper, TextField } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Endpoints } from "../../../apis/apiContsants";
 import instance from "../../../apis/apiRequest";
@@ -9,10 +9,9 @@ import useSnackBarStore, { SnackbarType } from "../../../stores/SnacbarStore";
 const AddChapter = () => {
   const location = useLocation();
   const { courseId, editId } = location?.state;
-
   const { openSnackbar } = useSnackBarStore((state) => state);
+  const navigate = useNavigate();
 
-  //chapterForm form
   const [chapterForms, setChapterForms] = useState({
     courseId,
     title: "",
@@ -22,56 +21,107 @@ const AddChapter = () => {
     _id: editId,
   });
 
-  //useEffect for submitiing and editing data
+  const [newConcept, setNewConcept] = useState("");
+  const [newReference, setNewReference] = useState("");
+
   useEffect(() => {
     if (editId) {
       editChapter();
     }
   }, [editId]);
 
-  //input values
   const handleChange = (event) => {
-    event.preventDefault();
-    setChapterForms((previousData) => ({
-      ...previousData,
-      [event.target.name]: event.target.value,
+    const { name, value } = event.target;
+    setChapterForms((prev) => ({
+      ...prev,
+      [name]: value,
     }));
   };
 
-  //Add chapter
+  const handleConceptChange = (index, value) => {
+    setChapterForms((prev) => ({
+      ...prev,
+      concepts: prev.concepts.map((concept, i) =>
+        i === index ? value : concept
+      ),
+    }));
+  };
+
+  const handleReferenceChange = (index, value) => {
+    setChapterForms((prev) => ({
+      ...prev,
+      references: prev.references.map((reference, i) =>
+        i === index ? value : reference
+      ),
+    }));
+  };
+
+  const clickConcept = () => {
+    if (newConcept.trim()) {
+      setChapterForms((prev) => ({
+        ...prev,
+        concepts: [...prev.concepts, newConcept],
+      }));
+      setNewConcept("");
+    }
+  };
+
+  const clickReference = () => {
+    if (newReference.trim()) {
+      setChapterForms((prev) => ({
+        ...prev,
+        references: [...prev.references, newReference],
+      }));
+      setNewReference("");
+    }
+  };
+
+  const deleteConcept = (index) => {
+    setChapterForms((prev) => ({
+      ...prev,
+      concepts: prev.concepts.filter((_, i) => i !== index),
+    }));
+  };
+
+  const deleteReference = (index) => {
+    setChapterForms((prev) => ({
+      ...prev,
+      references: prev.references.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = () => {
+    const data = { ...chapterForms };
+    editId ? updateChapter(data) : addChapter(data);
+    navigate(-1);
+  };
+
   const addChapter = async (chapterData) => {
     try {
       const res = await instance.post(Endpoints.addChapterApi, chapterData);
-      console.log("chapter added", res.data.data);
       openSnackbar({
         message: "Chapter added successfully",
         type: SnackbarType.success,
       });
-      // navigate();
     } catch (err) {
-      console.log("chapter didnt added!!! " + err);
       openSnackbar({
-        message: "failed to added the chapter !!!",
+        message: "Failed to add the chapter",
         type: SnackbarType.error,
       });
     }
   };
 
-  //updating the chapter
-
   const updateChapter = async (data) => {
     try {
       const res = await instance.post(Endpoints.updateChapterApi, data);
-      console.log("course updated successfully", res.data.data);
       setChapterForms(res.data.data);
       openSnackbar({
         message: "Chapter updated successfully",
         type: SnackbarType.success,
       });
     } catch (err) {
-      console.log("cant updated the student", err);
       openSnackbar({
-        message: "Failed to update the chapter!!!",
+        message: "Failed to update the chapter",
         type: SnackbarType.error,
       });
     }
@@ -80,219 +130,107 @@ const AddChapter = () => {
   const editChapter = async () => {
     try {
       const res = await instance.get(Endpoints.chapterApi + editId);
-      console.log("single chapter data received:", res.data.data);
       setChapterForms(res.data.data);
     } catch (err) {
-      console.log("cant get the single chapter data: ", err);
+      console.log("Error fetching chapter data:", err);
     }
   };
 
-  //submiting and updating the course
-  const navigate = useNavigate();
-  const handleSubmit = () => {
-    const data = {
-      ...chapterForms,
-    };
-    editId ? updateChapter(data) : addChapter(data);
-    navigate(-1);
-  };
-
-  // adding concepts in form
-  const [addConcept, setAddConcept] = useState([]);
-  const handleConcepts = (event) => {
-    setAddConcept(event.target.value);
-  };
-  const clickConcept = () => {
-    chapterForms.concepts.push(addConcept);
-    setAddConcept("");
-  };
-
-  //delete the concepts
-  const deleteConcepts = (delCon) => {
-    const delConcept = [...chapterForms.concepts];
-    delConcept.splice(delCon, 1);
-    setChapterForms((prv) => ({
-      ...prv,
-      concepts: delConcept,
-    }));
-  };
-
-  const editClickConcept = (e) => {
-    setChapterForms((previousData) => ({
-      ...previousData,
-      concepts: { [e.target.name]: e.target.value },
-    }));
-  };
-
-  //adding references in form
-  const [addReferences, setAddReferences] = useState([]);
-  const handleReferences = (e) => {
-    setAddReferences(e.target.value);
-  };
-  const clickReferences = () => {
-    chapterForms.references.push(addReferences);
-    setAddReferences("");
-  };
-
-  //delete the refrences
-  const deleteReferences = (delRef) => {
-    const delReferences = [...chapterForms.references];
-    delReferences.splice(delRef, 1);
-    setChapterForms((prv) => ({
-      ...prv,
-      references: delReferences,
-    }));
-  };
-
   return (
-    <Box
-      sx={{ display: "flex", justifyContent: "center", alignContent: "center" }}
-    >
-      <Paper className="mainSyllabus">
-        <Box>
-          <h1>{editId ? "Update the chapter" : "Add the chapter"}</h1>
-        </Box>
-        <Box className="form">
-          <Box className="input-syllabus">
+    <Box className="flex justify-center items-center">
+      <Paper
+        variant="outlined"
+        className="flex flex-col justify-center items-center md:w-1/2 p-4"
+      >
+        <h1>{editId ? "Update the chapter" : "Add the chapter"}</h1>
+        <Box className="w-full">
+          <Box className="grid md:grid-cols-2 gap-2">
             <TextField
               label="Title"
-              variant="outlined"
-              className="syllabus"
-              autoComplete="off"
-              onChange={handleChange}
               name="title"
+              onChange={handleChange}
               value={chapterForms.title}
+              className="w-full"
             />
             <TextField
               label="Description"
-              variant="outlined"
-              className="syllabus"
-              autoComplete="off"
-              onChange={handleChange}
               name="description"
+              onChange={handleChange}
               value={chapterForms.description}
+              className="w-full"
             />
+          </Box>
 
-            {/* concepts */}
+          {/* Concepts */}
+          <Box className="flex flex-col gap-4">
             <h1>Concepts</h1>
-            <Box>
+            <Box className="flex  gap-2">
               <TextField
-                variant="outlined"
-                autoComplete="off"
-                onChange={handleConcepts}
-                value={addConcept}
-                name="addConcept"
-                sx={{ width: "100%" }}
-                onKeyDown={(event) => {
-                  if (event.keyCode === 13) {
-                    clickConcept();
-                  }
-                }}
+                value={newConcept}
+                onChange={(e) => setNewConcept(e.target.value)}
+                onKeyDown={(e) => e.keyCode === 13 && clickConcept()}
+                placeholder="Add new concept"
+                className="w-full"
               />
-            </Box>
-            <Divider />
-            <Box>
-              <Box>
-                {chapterForms.concepts.map((item, value) => (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    <Box>
-                      <TextField
-                        variant="outlined"
-                        autoComplete="off"
-                        onChange={editClickConcept}
-                        value={item}
-                        sx={{ width: "25rem" }}
-                        name="addConcept"
-                      />
-                    </Box>
-                    <Button color="error" onClick={() => deleteConcepts(value)}>
-                      <DeleteIcon />
-                    </Button>
-                  </Box>
-                ))}
-              </Box>
-              <Button
-                variant="outlined"
-                className="concept-btn"
-                onClick={clickConcept}
-                sx={{ height: "40px" }}
-              >
+              <Button variant="outlined" onClick={clickConcept}>
                 Add
               </Button>
             </Box>
-
-            {/* reference */}
-            <h1>References</h1>
-            <Box>
-              <TextField
-                variant="outlined"
-                autoComplete="off"
-                onChange={handleReferences}
-                value={addReferences}
-                name="addReference"
-                sx={{ width: "100%" }}
-                onKeyDown={(event) => {
-                  if (event.keyCode === 13) {
-                    clickReferences();
-                  }
-                }}
-              />
-            </Box>
-            <Divider />
-            <Box>
-              <Box>
-                {chapterForms.references.map((item, value) => (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "20px",
-                    }}
-                    key={value}
-                  >
-                    <Box>
-                      <TextField
-                        variant="outlined"
-                        autoComplete="off"
-                        onChange={handleReferences}
-                        value={item}
-                        sx={{ width: "25rem" }}
-                        name="addReference"
-                      />
-                    </Box>
-                    <Button
-                      color="error"
-                      onClick={() => deleteReferences(value)}
-                    >
-                      <DeleteIcon />
-                    </Button>
-                  </Box>
-                ))}
-              </Box>
-              <Button
-                variant="outlined"
-                className="concept-btn"
-                onClick={clickReferences}
-                sx={{ height: "40px" }}
-              >
-                Add
-              </Button>
+            <Box className="grid md:grid-cols-2 gap-2">
+              {chapterForms.concepts.map((item, index) => (
+                <Box key={index} className="flex flex-row">
+                  <TextField
+                    value={item}
+                    onChange={(e) => handleConceptChange(index, e.target.value)}
+                    label={`Concept ${index + 1}`}
+                    className="w-full"
+                  />
+                  <Button color="error" onClick={() => deleteConcept(index)}>
+                    <DeleteIcon />
+                  </Button>
+                </Box>
+              ))}
             </Box>
           </Box>
-          <Button
-            variant="contained"
-            type="submit"
-            className="submit-btn"
-            onClick={handleSubmit}
-          >
-            {editId ? "update" : "submit"}
-          </Button>
+
+          {/* References */}
+          <Box className="flex flex-col gap-4">
+            <h1>References</h1>
+            <Box className="flex gap-2">
+              <TextField
+                value={newReference}
+                onChange={(e) => setNewReference(e.target.value)}
+                onKeyDown={(e) => e.keyCode === 13 && clickReference()}
+                placeholder="Add new reference"
+                className="w-full"
+              />
+              <Button variant="outlined" onClick={clickReference}>
+                Add
+              </Button>
+            </Box>
+            <Box className="grid md:grid-cols-2 gap-2">
+              {chapterForms.references.map((item, index) => (
+                <Box key={index} className="flex flex-row">
+                  <TextField
+                    value={item}
+                    onChange={(e) =>
+                      handleReferenceChange(index, e.target.value)
+                    }
+                    label={`Reference ${index + 1}`}
+                    className="w-full"
+                  />
+                  <Button color="error" onClick={() => deleteReference(index)}>
+                    <DeleteIcon />
+                  </Button>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+          <Box className="flex justify-center items-center mt-6">
+            <Button variant="contained" type="submit" onClick={handleSubmit}>
+              {editId ? "Update" : "Submit"}
+            </Button>
+          </Box>
         </Box>
       </Paper>
     </Box>

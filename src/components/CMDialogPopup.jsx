@@ -35,13 +35,14 @@ export default function CMDialogBox() {
         fullScreen={fullScreen}
         open={dialogData?.open}
         onClose={handleNegative}
-        aria-labelledby="responsive-dialog-title"
       >
-        <DialogTitle id="responsive-dialog-title">
+        <DialogTitle className="bg-red-600 text-white">
           {dialogData?.title}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>{dialogData?.message}</DialogContentText>
+          <DialogContentText className="mt-2">
+            {dialogData?.message}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button

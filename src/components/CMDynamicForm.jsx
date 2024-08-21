@@ -73,27 +73,25 @@ const CMDynamicForm = (props) => {
     props.onSubmit(formData);
   };
   return (
-    <Box>
-      <Card className="p-5 flex flex-col gap-3">
-        <h2 className="text-center">
-          {props.editedData ? formFields.heading2 : formFields.heading}
-        </h2>
-        <p className="text-center">{formFields.description}</p>
-        <Box
-          className={`grid ${
-            formFields.fields.length > 3 ? "md:grid-cols-2" : "grid-cols-1"
-          } grid-cols-1 gap-3`}
-        >
-          {formFields.fields.map((field, index) => (
-            <Box key={index}>{RenderField(field)}</Box>
-          ))}
-        </Box>
-        <CMButton
-          variant="contained"
-          onClick={handleSubmit}
-          name={props.editedData ? formFields.btn2 : formFields.btn}
-        />
-      </Card>
+    <Box className="flex flex-col gap-3">
+      <h2 className="text-center">
+        {props.editedData ? formFields.heading2 : formFields.heading}
+      </h2>
+      <p className="text-center">{formFields.description}</p>
+      <Box
+        className={`grid ${
+          formFields.fields.length > 3 ? "md:grid-cols-2" : "grid-cols-1"
+        } grid-cols-1 gap-3`}
+      >
+        {formFields.fields.map((field, index) => (
+          <Box key={index}>{RenderField(field)}</Box>
+        ))}
+      </Box>
+      <CMButton
+        variant="contained"
+        onClick={handleSubmit}
+        name={props.editedData ? formFields.btn2 : formFields.btn}
+      />
     </Box>
   );
 };

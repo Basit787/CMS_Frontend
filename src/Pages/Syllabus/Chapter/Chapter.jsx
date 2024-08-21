@@ -77,10 +77,10 @@ const Chapter = () => {
   };
 
   //Delete popup
-  const handleDeleteOpen = (id) => {
+  const handleDeleteOpen = (id, title) => {
     openDialog({
-      title: "Are you sure that you want to delete the chapter!!!",
-      message: "If you delete the above chapter it cant be undo!!! ",
+      title: `Delete ${title}`,
+      message: "Are you sure you want to delete the chapter",
       response: (ActionType) => {
         if (ActionType === "positive") {
           handleDeleteChapter(id);
@@ -101,15 +101,11 @@ const Chapter = () => {
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box>
             <h2>
-              Chapter: <i>{courseTitle}</i>
+              Course: <i>{courseTitle}</i>
             </h2>
           </Box>
           <Box>
-            <Button
-              variant="contained"
-              sx={{ mr: 1 }}
-              onClick={openChapterForm}
-            >
+            <Button variant="contained" onClick={openChapterForm}>
               Add Chapter
             </Button>
           </Box>
@@ -119,78 +115,57 @@ const Chapter = () => {
         <Typography>{"No chapter were added till !!!"}</Typography>
       ) : (
         chapter.map((item) => (
-          <Card
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: "10px",
-            }}
-          >
-            <Box sx={{ width: "100%" }}>
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<GridExpandMoreIcon />}
-                  aria-controls="panel1-content"
-                  id="panel1-header"
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      width: "100%",
-                    }}
-                  >
-                    <h2>{item.title}</h2>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        gap: "10px",
-                        margin: "10px",
-                      }}
+          <Card className="m-2">
+            <Accordion className="p-2">
+              <AccordionSummary expandIcon={<GridExpandMoreIcon />}>
+                <Box className="grid grid-cols-2 md:flex md:justify-between w-full">
+                  <h2 className="break-words">{item.title}</h2>
+                  <Box className="flex flex-col md:flex-row">
+                    {/* edit button */}
+                    <Button
+                      color="success"
+                      onClick={() => handleEditChapter(item._id)}
                     >
-                      {/* edit button */}
-                      <Button
-                        color="success"
-                        onClick={() => handleEditChapter(item._id)}
-                      >
-                        <EditIcon />
-                      </Button>
-                      {/* delete button */}
-
-                      <Button
-                        color="error"
-                        onClick={() => handleDeleteOpen(item._id)}
-                      >
-                        <DeleteIcon />
-                      </Button>
+                      <EditIcon />
+                    </Button>
+                    {/* delete button */}
+                    <Button
+                      color="error"
+                      onClick={() => handleDeleteOpen(item._id, item.title)}
+                    >
+                      <DeleteIcon />
+                    </Button>
+                  </Box>
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box className="flex flex-col gap-3">
+                  <p className="break-words">{item.description}</p>
+                  <Box className="flex flex-col md:flex-row gap-4">
+                    <Box className="w-1/2">
+                      <h3>Concepts</h3>
+                      <ul className="w-full">
+                        {item.concepts.map((concpets) => (
+                          <li>{concpets}</li>
+                        ))}
+                      </ul>
+                    </Box>
+                    <Box className="w-1/2">
+                      <h3>Reference</h3>
+                      <ul className="w-full">
+                        {item.references.map((references) => (
+                          <li>
+                            <Link href={references} target="_blank">
+                              {references}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
                     </Box>
                   </Box>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Box>
-                    <p>{item.description}</p>
-                    <h3>Concepts</h3>
-                    <ul>
-                      {item.concepts.map((concpets) => (
-                        <li>{concpets}</li>
-                      ))}
-                    </ul>
-                    <h3>Reference</h3>
-                    <ul>
-                      {item.references.map((references) => (
-                        <li>
-                          <Link href={references} target="_blank">
-                            {references}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </Box>
-                </AccordionDetails>
-              </Accordion>
-            </Box>
+                </Box>
+              </AccordionDetails>
+            </Accordion>
           </Card>
         ))
       )}

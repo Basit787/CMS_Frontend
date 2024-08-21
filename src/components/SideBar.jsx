@@ -24,6 +24,7 @@ import { NavLink } from "react-router-dom";
 import useDialogBoxStore, { ActionType } from "../stores/DialogBoxStore";
 import useLoginStore from "../stores/LoginStore";
 import useSnackBarStore, { SnackbarType } from "../stores/SnacbarStore";
+import useHeadingStore from "../stores/HeadingStore";
 
 const drawerWidth = 240;
 
@@ -80,14 +81,13 @@ export default function PersistentDrawerLeft({ children }) {
     setOpen(true);
   };
 
-  const [heading, setHeading] = useState("Dashboard"); //heading on sidebar
-
   const handleDrawerClose = () => {
     setOpen(false);
   };
   const { openDialog } = useDialogBoxStore((state) => state);
   const { logout } = useLoginStore((state) => state);
   const { openSnackbar } = useSnackBarStore((state) => state);
+  const { heading, headingName } = useHeadingStore((state) => state);
 
   const handleOpenDialog = () => {
     openDialog({
@@ -181,7 +181,7 @@ export default function PersistentDrawerLeft({ children }) {
             <ListItem
               key={item.name}
               disablePadding
-              onClick={() => setHeading(item.name)}
+              onClick={() => headingName(item.name)}
             >
               <ListItemButton component={NavLink} to={item.path}>
                 <ListItemIcon>{item.icon}</ListItemIcon>

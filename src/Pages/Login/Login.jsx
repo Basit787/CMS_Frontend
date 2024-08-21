@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Card } from "@mui/material";
 import { Endpoints } from "../../apis/apiContsants";
 import instance from "../../apis/apiRequest";
 import CMDynamicForm from "../../components/CMDynamicForm";
@@ -30,9 +30,9 @@ const Login = () => {
   };
   return (
     <Box className="flex justify-center items-center min-h-screen bgImg ">
-      <Box className="md:w-1/3 w-full">
+      <Card className="md:w-1/3 w-full p-2">
         <CMDynamicForm formFields={LoginFields} onSubmit={handleSubmit} />
-      </Box>
+      </Card>
     </Box>
   );
 };

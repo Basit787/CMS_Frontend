@@ -8,12 +8,14 @@ const CourseAdd = (props) => {
     props.onSubmit(formData);
   };
   return (
-    <Box className=" w-full">
-      <CMDynamicForm
-        formFields={addCourseForm}
-        onSubmit={handleSubmit}
-        editedData={props.sendCourse}
-      />
+    <Box>
+      <Box className=" w-full">
+        <CMDynamicForm
+          formFields={addCourseForm}
+          onSubmit={handleSubmit}
+          editedData={props.sendCourse}
+        />
+      </Box>
     </Box>
   );
 };

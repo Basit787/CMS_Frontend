@@ -62,7 +62,7 @@ const Dashboard = () => {
   return (
     <Box>
       <Box>
-        <Box className="grid md:grid-cols-4 grid-cols-2 flex-wrap justify-between items-center gap-3">
+        <Box className="grid md:grid-cols-2 flex-wrap md:justify-between items-center gap-3">
           {dashboard.map((item, value) => (
             <Card
               key={value}

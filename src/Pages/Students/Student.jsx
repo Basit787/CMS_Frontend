@@ -211,7 +211,7 @@ const Students = () => {
           <Button
             color="error"
             onClick={() => {
-              handleClickDeleteOpen(row._id);
+              handleClickDeleteOpen(row._id, row.studentname);
             }}
           >
             <DeleteIcon />
@@ -222,9 +222,9 @@ const Students = () => {
   };
 
   //delete popup
-  const handleClickDeleteOpen = (deleteId) => {
+  const handleClickDeleteOpen = (deleteId, name) => {
     openDialog({
-      title: "Are you sure to delete the student?",
+      title: `Are you sure to delete the student name ${name}?`,
       message: "Are you sure, because this procedure cannot be undo!!!",
       response: (ActionType) => {
         if (ActionType === "positive") {
@@ -251,7 +251,7 @@ const Students = () => {
           Add Student
         </Button>
         {open && (
-          <DialogBox closeTrue={(event) => setOpen(event)}>
+          <DialogBox close={(event) => setOpen(event)}>
             <Addmission
               onSubmit={onSubmitClick}
               sendStudentData={editedStudentData}

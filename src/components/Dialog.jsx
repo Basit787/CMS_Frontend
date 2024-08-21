@@ -5,17 +5,12 @@ import * as React from "react";
 export default function DialogBox(props) {
   const handleClose = (event, action) => {
     if (action === "backdropClick") {
-      props.closeTrue(false);
+      props.close(false);
     }
   };
 
   return (
-    <Dialog
-      open={true}
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
+    <Dialog open={true} onClose={handleClose}>
       <DialogContent>{props.children}</DialogContent>
     </Dialog>
   );
