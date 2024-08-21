@@ -11,10 +11,9 @@ import { useNavigate } from "react-router-dom";
 import { Endpoints } from "../../../apis/apiContsants";
 import instance from "../../../apis/apiRequest";
 import DialogBox from "../../../components/Dialog";
-import CourseAdd from "./CourseAdd";
 import useDialogBoxStore from "../../../stores/DialogBoxStore";
 import useSnackBarStore, { SnackbarType } from "../../../stores/SnacbarStore";
-import useHeadingStore from "../../../stores/HeadingStore";
+import CourseAdd from "./CourseAdd";
 
 const Course = () => {
   const [courseData, setCourseData] = useState([]);

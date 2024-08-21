@@ -1,9 +1,9 @@
-import { Box, Card } from "@mui/material";
+import { Box } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import CMTextField from "./CMTextField";
-import CMPassword from "./CMPassword";
 import CMButton from "./CMButton";
+import CMPassword from "./CMPassword";
 import CMSelect from "./CMSelect";
+import CMTextField from "./CMTextField";
 
 const CMDynamicForm = (props) => {
   const formFields = props.formFields;
@@ -45,7 +45,6 @@ const CMDynamicForm = (props) => {
       return (
         <CMPassword
           label={field.label}
-          type={field.type}
           onChange={handleChange}
           value={formData[field.name]}
           name={field.name}

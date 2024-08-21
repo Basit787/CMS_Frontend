@@ -14,8 +14,8 @@ const Login = () => {
   const handleSubmit = async (submitData) => {
     try {
       const userData = await instance.post(Endpoints.student_Login, {
-        email: submitData.email,
-        password: submitData.password,
+        email: submitData.email.trim(),
+        password: submitData.password.trim(),
       });
       const token = userData.data.data.token;
       localStorage.setItem("token", token);

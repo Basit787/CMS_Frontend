@@ -17,11 +17,7 @@ const CMPassword = (props) => {
     event.preventDefault();
   };
   return (
-    <FormControl
-      required={props.required}
-      variant={props.variant || "outlined"}
-      className={props.classname || "w-full"}
-    >
+    <FormControl required={props.required} className={"w-full"} {...props}>
       <InputLabel htmlFor="outlined-adornment-password">
         {props.label}
       </InputLabel>
@@ -44,7 +40,7 @@ const CMPassword = (props) => {
         onChange={props.onChange}
         name={props.name}
         value={props.value}
-        {...props}
+        placeholder={props.placeholder}
       />
     </FormControl>
   );
