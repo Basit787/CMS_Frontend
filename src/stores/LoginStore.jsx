@@ -16,7 +16,7 @@ export const LoginStore = (set) => ({
 });
 
 const useLoginStore = create(
-  devtools(persist(LoginStore, { name: "dialogBox" }))
+  devtools(persist(LoginStore, { name: "userDetails" }))
 );
 
 export default useLoginStore;
