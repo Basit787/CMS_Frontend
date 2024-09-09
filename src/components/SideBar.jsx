@@ -1,10 +1,9 @@
 import { AccountCircle, Dashboard } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Button } from "@mui/material";
+import { Button, Card, CardContent, CardHeader } from "@mui/material";
 import MuiAppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -16,15 +15,18 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { styled, useTheme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
+import SessionDetails from "../helpers/sessionDetails";
 import useDialogBoxStore, { ActionType } from "../stores/DialogBoxStore";
 import useHeadingStore from "../stores/HeadingStore";
 import useLoginStore from "../stores/LoginStore";
 import useSnackBarStore, { SnackbarType } from "../stores/SnacbarStore";
+import DialogBox from "./Dialog";
+import BadgeIcon from "@mui/icons-material/Badge";
 
 const drawerWidth = 240;
 
@@ -74,8 +76,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 export default function PersistentDrawerLeft({ children }) {
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -87,7 +89,7 @@ export default function PersistentDrawerLeft({ children }) {
   const { openDialog } = useDialogBoxStore((state) => state);
   const { logout } = useLoginStore((state) => state);
   const { openSnackbar } = useSnackBarStore((state) => state);
-  const { heading, headingName } = useHeadingStore((state) => state);
+  const { heading, setHeading } = useHeadingStore((state) => state);
 
   const handleOpenDialog = () => {
     openDialog({
@@ -116,7 +118,7 @@ export default function PersistentDrawerLeft({ children }) {
     {
       path: "/students",
       name: "Students",
-      icon: <AccountCircle />,
+      icon: <BadgeIcon />,
     },
     {
       path: "/course",
@@ -125,9 +127,44 @@ export default function PersistentDrawerLeft({ children }) {
     },
   ];
 
+  const currentUser = JSON.parse(
+    JSON.stringify(SessionDetails.getCurrentUser())
+  );
+
+  const renderUserDetails = (user) => (
+    <Box>
+      <p className="text-center font-bold">User Identity</p>
+      <Divider />
+      <Box className="m-2">
+        {Object.entries(user).map(
+          ([key, value]) =>
+            key !== "token" && (
+              <Typography
+                key={key}
+                variant="body2"
+                className="flex flex-row w-full"
+              >
+                <Box className="w-1/2 text-sm md:text-lg break-words">
+                  <b>{key.toUpperCase()}</b>
+                </Box>
+                <Box className="w-1/2 text-sm md:text-lg break-words">
+                  {value}
+                </Box>
+              </Typography>
+            )
+        )}
+      </Box>
+    </Box>
+  );
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
+      {dialogOpen && (
+        <DialogBox close={(e) => setDialogOpen(e)} className="w-96">
+          <Box className="w-full">{renderUserDetails(currentUser)}</Box>
+        </DialogBox>
+      )}
       <AppBar position="fixed" open={open}>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box sx={{ display: "flex" }}>
@@ -146,10 +183,10 @@ export default function PersistentDrawerLeft({ children }) {
           </Box>
           <Button
             variant="contained"
-            onClick={handleOpenDialog}
-            aria-hidden={true}
+            className=" h-8 w-8 rounded-full"
+            onClick={() => setDialogOpen(true)}
           >
-            <LogoutIcon />
+            <AccountCircle className="text-sky-100" />
           </Button>
         </Toolbar>
       </AppBar>
@@ -168,11 +205,7 @@ export default function PersistentDrawerLeft({ children }) {
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
+            <ChevronLeftIcon />
           </IconButton>
         </DrawerHeader>
         <Divider />
@@ -181,7 +214,7 @@ export default function PersistentDrawerLeft({ children }) {
             <ListItem
               key={item.name}
               disablePadding
-              onClick={() => headingName(item.name)}
+              onClick={() => setHeading(item.name)}
             >
               <ListItemButton component={NavLink} to={item.path}>
                 <ListItemIcon>{item.icon}</ListItemIcon>
@@ -191,6 +224,14 @@ export default function PersistentDrawerLeft({ children }) {
           ))}
         </List>
         <Divider />
+        <List className="flex justify-end items-end">
+          <ListItemButton onClick={handleOpenDialog}>
+            <ListItemIcon>
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Logout"} />
+          </ListItemButton>
+        </List>
       </Drawer>
       <Main
         open={open}

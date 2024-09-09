@@ -39,12 +39,6 @@
       "placeholder": "Enter Your E-Mail"
     },
     {
-      "label": "Phone Number",
-      "name": "phoneNumber",
-      "type": "text",
-      "placeholder": "Enter Your Phone Number"
-    },
-    {
       "label": "Select Gender",
       "name": "gender",
       "type": "select",
@@ -74,26 +68,28 @@
     {
       "label": "Highest Qualification",
       "name": "highestQualification",
-      "type": "select",
-      "options": [
-        { "name": "Male", "value": "male" },
-        { "name": "Female", "value": "female" }
-      ]
+      "type": "select"
     },
     {
       "label": "Select Course",
       "name": "selectCourse",
-      "type": "select",
-      "options": [
-        { "name": "Male", "value": "male" },
-        { "name": "Female", "value": "female" }
-      ]
+      "type": "select"
     },
     {
-      "label": "Pan-Card (optional)",
+      "label": "Address",
       "name": "address",
-      "type": "textarea",
-      "placeholder": "Enter your address"
+      "type": "text",
+      "placeholder": "Enter Your Address"
+    },
+    {
+      "label": "Rec Status",
+      "name": "recStatus",
+      "type": "select",
+      "options": [
+        { "name": "Active", "value": "active" },
+        { "name": "In-Active", "value": "inactive" },
+        { "name": "Completed", "value": "completed" }
+      ]
     }
   ],
   "btn": "Submit",

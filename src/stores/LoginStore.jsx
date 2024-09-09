@@ -16,7 +16,13 @@ export const LoginStore = (set) => ({
 });
 
 const useLoginStore = create(
-  devtools(persist(LoginStore, { name: "userDetails" }))
+  devtools(
+    persist(LoginStore, {
+      name: "user",
+      getStorage: () => localStorage,
+      // getStorage: () => sessionStorage,
+    })
+  )
 );
 
 export default useLoginStore;

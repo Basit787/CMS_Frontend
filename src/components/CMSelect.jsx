@@ -12,10 +12,8 @@ const CMSelect = (props) => {
         name={props.name}
         {...props}
       >
-        <MenuItem value="" disabled>
-          Select Option
-        </MenuItem>
-        {props.options.map((option, index) => (
+        <MenuItem disabled>Select Option</MenuItem>
+        {props.options?.map((option, index) => (
           <MenuItem value={option.value} key={index}>
             {option.name}
           </MenuItem>

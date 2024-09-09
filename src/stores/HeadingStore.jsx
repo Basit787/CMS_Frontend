@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 const HeadingStore = (set) => ({
-  heading: "Description",
-  headingName: (data) => {
+  heading: "Dashboard",
+  setHeading: (data) => {
     set(() => ({
       heading: data,
     }));

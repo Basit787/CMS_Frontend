@@ -5,16 +5,14 @@ import CMPassword from "./CMPassword";
 import CMSelect from "./CMSelect";
 import CMTextField from "./CMTextField";
 
-const CMDynamicForm = (props) => {
-  const formFields = props.formFields;
-
+const CMDynamicForm = ({ formFields, editedData, onSubmit }) => {
   const [formData, setFormData] = useState("");
 
   useEffect(() => {
-    if (props.editedData) {
-      setFormData(props.editedData);
+    if (editedData) {
+      setFormData(editedData);
     }
-  }, [props.editedData]);
+  }, [editedData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,13 +66,12 @@ const CMDynamicForm = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
-    props.onSubmit(formData);
+    onSubmit(formData);
   };
   return (
     <Box className="flex flex-col gap-3">
       <h2 className="text-center">
-        {props.editedData ? formFields.heading2 : formFields.heading}
+        {editedData ? formFields.heading2 : formFields.heading}
       </h2>
       <p className="text-center">{formFields.description}</p>
       <Box
@@ -89,7 +86,7 @@ const CMDynamicForm = (props) => {
       <CMButton
         variant="contained"
         onClick={handleSubmit}
-        name={props.editedData ? formFields.btn2 : formFields.btn}
+        name={editedData ? formFields?.btn2 : formFields?.btn}
       />
     </Box>
   );

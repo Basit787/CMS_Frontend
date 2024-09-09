@@ -1,46 +1,15 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  Box,
-  Button,
-  Card,
-  Table,
-  TableBody,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import { Box, Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Endpoints } from "../../apis/apiContsants";
 import instance from "../../apis/apiRequest";
 import Appbar from "../../components/Appbar";
+import CMTable from "../../components/CMTable";
 import DialogBox from "../../components/Dialog";
 import useDialogBoxStore from "../../stores/DialogBoxStore";
 import useSnackBarStore, { SnackbarType } from "../../stores/SnacbarStore";
 import Addmission from "../Addmission/Addmission";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
 
 const Students = () => {
   const [userData, setData] = useState([]);
@@ -81,7 +50,6 @@ const Students = () => {
     try {
       const res = await instance.post(Endpoints.registerStudent, params);
       console.log("student added", res.data.data);
-      getStudentsData();
       handleClose();
       openSnackbar({
         type: SnackbarType.success,
@@ -133,7 +101,6 @@ const Students = () => {
     try {
       const res = await instance.delete(Endpoints.student + params);
       console.log("student deleted successfully" + res.data);
-      getStudentsData();
       openSnackbar({
         type: SnackbarType.success,
         message: "Student deleted successfully",
@@ -172,55 +139,6 @@ const Students = () => {
     setEditedStudentData(undefined);
   };
 
-  const getTableHeads = () => {
-    return (
-      <TableRow>
-        <StyledTableCell>Name</StyledTableCell>
-        <StyledTableCell align="center">Contact</StyledTableCell>
-        <StyledTableCell align="center">E-Mail</StyledTableCell>
-        <StyledTableCell align="center">Date of Joining</StyledTableCell>
-        <StyledTableCell align="center">Qualification</StyledTableCell>
-        <StyledTableCell align="center">Course</StyledTableCell>
-        <StyledTableCell align="center">Action</StyledTableCell>
-      </TableRow>
-    );
-  };
-
-  const getTableBody = (row, index) => {
-    return (
-      <StyledTableRow key={index}>
-        <StyledTableCell component="th" scope="row">
-          {row.studentname}
-        </StyledTableCell>
-        <StyledTableCell align="center">{row.phoneNumber}</StyledTableCell>
-        <StyledTableCell align="center">{row.email}</StyledTableCell>
-        <StyledTableCell align="center">{row.dateOfJoining}</StyledTableCell>
-        <StyledTableCell align="center">
-          {row.highestQualification}
-        </StyledTableCell>
-        <StyledTableCell align="center">{row.selectCourse}</StyledTableCell>
-        <StyledTableCell align="center">
-          <Button
-            color="success"
-            onClick={() => {
-              handleEdit(row._id);
-            }}
-          >
-            <EditIcon />
-          </Button>
-          <Button
-            color="error"
-            onClick={() => {
-              handleClickDeleteOpen(row._id, row.studentname);
-            }}
-          >
-            <DeleteIcon />
-          </Button>
-        </StyledTableCell>
-      </StyledTableRow>
-    );
-  };
-
   //delete popup
   const handleClickDeleteOpen = (deleteId, name) => {
     openDialog({
@@ -244,6 +162,35 @@ const Students = () => {
     });
   };
 
+  const tablehead = [
+    "Name",
+    "Contact",
+    "E-Mail",
+    "Date of Joining",
+    "Qualification",
+    "Course",
+    "Action",
+  ];
+
+  const tableBody = userData.map((data) => [
+    data.studentname,
+    data.phoneNumber,
+    data.email,
+    data.dateOfJoining,
+    data.highestQualification,
+    data.c,
+    <Box key={data._id}>
+      <Button onClick={() => handleEdit(data._id)} color="success">
+        <EditIcon />
+      </Button>
+      <Button
+        onClick={() => handleClickDeleteOpen(data._id, data.studentname)}
+        color="error"
+      >
+        <DeleteIcon />
+      </Button>
+    </Box>,
+  ]);
   return (
     <Box>
       <Appbar>
@@ -251,7 +198,7 @@ const Students = () => {
           Add Student
         </Button>
         {open && (
-          <DialogBox close={(event) => setOpen(event)}>
+          <DialogBox close={(event) => setOpen(event)} className="w-full">
             <Addmission
               onSubmit={onSubmitClick}
               sendStudentData={editedStudentData}
@@ -264,16 +211,7 @@ const Students = () => {
           {"No students were added"}
         </Typography>
       ) : (
-        <>
-          <TableContainer component={Card}>
-            <Table aria-label="customized table">
-              <TableHead>{getTableHeads()}</TableHead>
-              <TableBody>
-                {userData.map((row, index) => getTableBody(row, index))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </>
+        <CMTable tableHead={tablehead} tableBody={tableBody} />
       )}
     </Box>
   );

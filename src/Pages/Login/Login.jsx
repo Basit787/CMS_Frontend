@@ -17,8 +17,6 @@ const Login = () => {
         email: submitData.email.trim(),
         password: submitData.password.trim(),
       });
-      const token = userData.data.data.token;
-      localStorage.setItem("token", token);
       login(userData.data.data);
     } catch (error) {
       console.log("login failed" + error);
@@ -28,6 +26,7 @@ const Login = () => {
       });
     }
   };
+
   return (
     <Box className="flex justify-center items-center min-h-screen bgImg ">
       <Card className="md:w-1/3 w-full p-2">

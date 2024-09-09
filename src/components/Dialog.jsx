@@ -11,7 +11,7 @@ export default function DialogBox(props) {
 
   return (
     <Dialog open={true} onClose={handleClose}>
-      <DialogContent>{props.children}</DialogContent>
+      <DialogContent {...props}>{props.children}</DialogContent>
     </Dialog>
   );
 }

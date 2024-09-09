@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Endpoints } from "../../../apis/apiContsants";
-import instance from "../../../apis/apiRequest";
+import ApiRequest from "../../../apis/apiRequest";
 import DialogBox from "../../../components/Dialog";
 import useDialogBoxStore from "../../../stores/DialogBoxStore";
 import useSnackBarStore, { SnackbarType } from "../../../stores/SnacbarStore";
@@ -30,7 +30,7 @@ const Course = () => {
   //getCourse
   const getCourseData = async () => {
     try {
-      const res = await instance.get(Endpoints.courseApi, {
+      const res = await ApiRequest.get(Endpoints.courseApi, {
         params: courseData._id,
       });
       console.log("get course", res.data.data);
@@ -44,11 +44,10 @@ const Course = () => {
     }
   };
   //add course
-  const addCourseData = async (params) => {
+  const addCourseData = async (data) => {
     try {
-      const res = await instance.post(Endpoints.addCourseApi, params);
+      const res = await ApiRequest.post(Endpoints.addCourseApi, data);
       console.log("get course", res.data.data);
-      getCourseData();
       handleClose();
       openSnackbar({
         message: "Course added successfully",
@@ -66,10 +65,8 @@ const Course = () => {
   //updateCourse
   const updateCourseData = async (params) => {
     try {
-      const res = await instance.post(Endpoints.updateCourseApi, params);
-
+      const res = await ApiRequest.post(Endpoints.updateCourseApi, params);
       console.log("course updated", res.data.data);
-      getCourseData();
       handleClose();
       openSnackbar({
         message: "Course updated successfully",
@@ -88,7 +85,7 @@ const Course = () => {
   const editCourseData = async (params) => {
     setOpen(true);
     try {
-      const res = await instance.get(Endpoints.courseApi + params);
+      const res = await ApiRequest.get(Endpoints.courseApi + params);
       console.log("get single course", res.data.data);
       setEditedCourse(res.data.data);
     } catch (err) {
@@ -98,8 +95,7 @@ const Course = () => {
 
   //deleteCourse
   const deleteCourseData = (params) => {
-    instance
-      .delete(Endpoints.courseApi + params)
+    ApiRequest.delete(Endpoints.courseApi + params)
       .then((res) => {
         console.log("course deleted", res.data.data);
         getCourseData();

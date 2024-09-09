@@ -3,7 +3,7 @@ import React from "react";
 
 const CMButton = (props) => {
   return (
-    <Button {...props} className={props.classname || "w-full"}>
+    <Button {...props} className={"w-full"}>
       {props.name}
     </Button>
   );

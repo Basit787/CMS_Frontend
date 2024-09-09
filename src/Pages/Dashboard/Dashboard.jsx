@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { Endpoints } from "../../apis/apiContsants";
 import instance from "../../apis/apiRequest";
 import useSnackBarStore, { SnackbarType } from "../../stores/SnacbarStore";
+import SessionDetails from "../../helpers/sessionDetails";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState([]);
