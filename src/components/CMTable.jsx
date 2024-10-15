@@ -36,7 +36,12 @@ export default function CMTable({ tableHead = [], tableBody = [] }) {
           <TableRow>
             {tableHead.length > 0 &&
               tableHead.map((head, index) => (
-                <StyledTableCell key={index}>{head}</StyledTableCell>
+                <StyledTableCell
+                  key={index}
+                  align={`${index === 0 ? "left" : "center"}`}
+                >
+                  {head}
+                </StyledTableCell>
               ))}
           </TableRow>
         </TableHead>
@@ -45,7 +50,12 @@ export default function CMTable({ tableHead = [], tableBody = [] }) {
             tableBody.map((tableBodyData, index) => (
               <StyledTableRow key={index}>
                 {tableBodyData.map((rowdata, index) => (
-                  <StyledTableCell key={index}>{rowdata}</StyledTableCell>
+                  <StyledTableCell
+                    key={index}
+                    align={`${index === 0 ? "left" : "center"}`}
+                  >
+                    {rowdata}
+                  </StyledTableCell>
                 ))}
               </StyledTableRow>
             ))}

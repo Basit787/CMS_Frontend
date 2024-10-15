@@ -19,8 +19,6 @@ const useLoginStore = create(
   devtools(
     persist(LoginStore, {
       name: "user",
-      getStorage: () => localStorage,
-      // getStorage: () => sessionStorage,
     })
   )
 );

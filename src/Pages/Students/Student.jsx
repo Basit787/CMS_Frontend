@@ -178,7 +178,7 @@ const Students = () => {
     data.email,
     data.dateOfJoining,
     data.highestQualification,
-    data.c,
+    data.selectCourse,
     <Box key={data._id}>
       <Button onClick={() => handleEdit(data._id)} color="success">
         <EditIcon />
